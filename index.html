@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Producción</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <button id="prevMonth">◀</button>
+    <h1 id="monthLabel">MES AÑO</h1>
+    <button id="nextMonth">▶</button>
+  </header>
+
+  <section id="weekdays">
+    <div>L</div>
+    <div>M</div>
+    <div>X</div>
+    <div>J</div>
+    <div>V</div>
+    <div>S</div>
+    <div>D</div>
+  </section>
+
+  <section id="calendar"></section>
+
+  <section id="monthSummary">
+    <div class="summary-value" id="monthTotal">0 m</div>
+    <div class="summary-excess excedente-neu" id="monthExcess">0 m</div>
+  </section>
+
+  <button id="openCycle">Calcular productividad</button>
+<!-- ===== RESULTADO DEL CICLO ===== -->
+<section id="cycleResult" class="hidden">
+  <h3>Resultado del ciclo</h3>
+
+  <div class="cycle-row">
+    <span>Metros realizados</span>
+    <strong id="cycleTotal">0 m</strong>
+  </div>
+
+  <div class="cycle-row">
+    <span>Días computables</span>
+    <strong id="cycleDays">0</strong>
+  </div>
+
+  <div class="cycle-row">
+    <span>Objetivo del ciclo</span>
+    <strong id="cycleTarget">0 m</strong>
+  </div>
+
+  <div class="cycle-row">
+    <span>Excedente</span>
+    <strong id="cycleExcess">0 m</strong>
+  </div>
+</section>
+<!-- ===== FIN RESULTADO ===== -->
+
+
+  <!-- ===== EDITOR DE DÍA ===== -->
+  <div id="dayEditor" class="editor hidden">
+    <div>
+      <h3 id="editorDate"></h3>
+
+      <label>
+        Turno:
+        <select id="editorTurno">
+          <option value="M">Mañana</option>
+          <option value="T">Tarde</option>
+          <option value="N">Noche</option>
+          <option value="D">Descanso</option>
+          <option value="V">Vacaciones</option>
+        </select>
+      </label>
+
+      <label>
+        Metros:
+        <input
+          type="number"
+          id="editorMetros"
+          step="0.1"
+          min="0"
+          inputmode="decimal"
+        >
+      </label>
+
+      <div class="editor-buttons">
+        <button id="saveDay">Guardar</button>
+        <button id="cancelDay">Cancelar</button>
+      </div>
+    </div>
+  </div>
+  <!-- ===== FIN EDITOR ===== -->
+
+  <!-- ===== SELECTOR DE CICLO ===== -->
+  <div id="cycleSelector" class="editor hidden">
+    <div>
+      <h3>Seleccionar ciclo</h3>
+
+      <label>
+        Fecha inicio:
+        <input type="date" id="cycleStart">
+      </label>
+
+      <label>
+        Fecha fin:
+        <input type="date" id="cycleEnd">
+      </label>
+
+      <div class="editor-buttons">
+        <button id="applyCycle">Aplicar</button>
+        <button id="cancelCycle">Cancelar</button>
+      </div>
+    </div>
+  </div>
+  <!-- ===== FIN SELECTOR ===== -->
+
+  <script src="db.js" defer></script>
+  <script src="app.js" defer></script>
+
+</body>
+</html>
+
+
+
+
