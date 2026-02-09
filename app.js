@@ -5,7 +5,7 @@ const TURNOS = {
   T: { cuenta: true },
   N: { cuenta: true },
   D: { cuenta: false },
-  V: { cuenta: false } // Vacaciones
+  V: { cuenta: false }
 };
 
 function turnoCuenta(turno) {
@@ -80,10 +80,10 @@ function renderCalendar() {
       const r = map[fecha];
       if (r) {
         cell.classList.add(`turno-${r.turno}`);
-        cell.innerHTML += `
-          <div class="day-turno">${r.turno}</div>
-          <div class="day-metros">${r.metros} m</div>
-        `;
+        cell.innerHTML += `<div class="day-turno">${r.turno}</div>`;
+        if (r.metros !== '') {
+          cell.innerHTML += `<div class="day-metros">${r.metros} m</div>`;
+        }
       }
 
       cell.addEventListener('click', () => openEditor(fecha));
@@ -111,7 +111,7 @@ function calcularResumenMensual(registros, year, month) {
   registros.forEach(r => {
     if (isSameMonth(r.fecha, year, month) && turnoCuenta(r.turno)) {
       diasTrabajados++;
-      metros += Number(r.metros || 0);
+      metros += r.metros !== '' ? Number(r.metros) : 0;
     }
   });
 
@@ -160,7 +160,7 @@ function initEditor() {
     saveDay({
       fecha: editingFecha,
       turno: editorTurno.value,
-      metros: Number(editorMetros.value)
+      metros: editorMetros.value.trim()
     }).then(() => {
       editor.classList.add('hidden');
       renderCalendar();
@@ -171,7 +171,7 @@ function initEditor() {
     editingFecha = fecha;
     editorDate.textContent = fecha;
     editorTurno.value = 'M';
-    editorMetros.value = 0;
+    editorMetros.value = '';
 
     getAllDays().then(registros => {
       const r = registros.find(x => x.fecha === fecha);
@@ -196,7 +196,7 @@ function calcularResumenCiclo(registros, inicio, fin) {
   registros.forEach(r => {
     if (r.fecha >= inicio && r.fecha <= fin && turnoCuenta(r.turno)) {
       dias++;
-      metros += Number(r.metros || 0);
+      metros += r.metros !== '' ? Number(r.metros) : 0;
     }
   });
 
@@ -277,7 +277,3 @@ function initCycleSelector() {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js');
 }
-
-
-
-
