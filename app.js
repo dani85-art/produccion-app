@@ -78,10 +78,11 @@ function renderCalendar() {
       cell.innerHTML = `<div class="day-number">${day}</div>`;
 
       const r = map[fecha];
-      if (r) {
+      if (r && r.turno) {
         cell.classList.add(`turno-${r.turno}`);
         cell.innerHTML += `<div class="day-turno">${r.turno}</div>`;
-        if (r.metros !== '') {
+
+        if (r.metros !== '' && r.metros !== null) {
           cell.innerHTML += `<div class="day-metros">${r.metros} m</div>`;
         }
       }
@@ -109,9 +110,14 @@ function calcularResumenMensual(registros, year, month) {
   let diasTrabajados = 0;
 
   registros.forEach(r => {
-    if (isSameMonth(r.fecha, year, month) && turnoCuenta(r.turno)) {
+    if (
+      isSameMonth(r.fecha, year, month) &&
+      turnoCuenta(r.turno) &&
+      r.metros !== '' &&
+      r.metros !== null
+    ) {
       diasTrabajados++;
-      metros += r.metros !== '' ? Number(r.metros) : 0;
+      metros += Number(r.metros);
     }
   });
 
@@ -152,6 +158,17 @@ function initEditor() {
   const editorTurno = document.getElementById('editorTurno');
   const editorMetros = document.getElementById('editorMetros');
 
+  function updateMetrosState() {
+    if (editorTurno.value === '') {
+      editorMetros.value = '';
+      editorMetros.disabled = true;
+    } else {
+      editorMetros.disabled = false;
+    }
+  }
+
+  editorTurno.addEventListener('change', updateMetrosState);
+
   document.getElementById('cancelDay')?.addEventListener('click', () => {
     editor.classList.add('hidden');
   });
@@ -170,15 +187,16 @@ function initEditor() {
   window.openEditor = function (fecha) {
     editingFecha = fecha;
     editorDate.textContent = fecha;
-    editorTurno.value = 'M';
+    editorTurno.value = '';
     editorMetros.value = '';
 
     getAllDays().then(registros => {
       const r = registros.find(x => x.fecha === fecha);
       if (r) {
-        editorTurno.value = r.turno;
-        editorMetros.value = r.metros;
+        editorTurno.value = r.turno ?? '';
+        editorMetros.value = r.metros ?? '';
       }
+      updateMetrosState();
     });
 
     editor.classList.remove('hidden');
@@ -194,9 +212,15 @@ function calcularResumenCiclo(registros, inicio, fin) {
   let dias = 0;
 
   registros.forEach(r => {
-    if (r.fecha >= inicio && r.fecha <= fin && turnoCuenta(r.turno)) {
+    if (
+      r.fecha >= inicio &&
+      r.fecha <= fin &&
+      turnoCuenta(r.turno) &&
+      r.metros !== '' &&
+      r.metros !== null
+    ) {
       dias++;
-      metros += r.metros !== '' ? Number(r.metros) : 0;
+      metros += Number(r.metros);
     }
   });
 
