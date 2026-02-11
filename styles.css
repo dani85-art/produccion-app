@@ -206,7 +206,31 @@ body {
   margin: 4px 0;
   font-weight: 600;
 }
+/* ===== BOTONES DE TURNO (EDITOR) ===== */
+.turno-buttons {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
 
+.turno-buttons button {
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1px solid #bfc5cc;
+  background: #f5f7fa;
+  color: #111;
+  cursor: pointer;
+}
 
+.turno-buttons button:active {
+  transform: scale(0.97);
+}
 
-
+/* Estado seleccionado */
+.turno-buttons button.active {
+  background: #e0e7ff;
+  border-color: #5c7cfa;
+}
