@@ -157,6 +157,7 @@ function initEditor() {
   const editorDate = document.getElementById('editorDate');
   const editorTurno = document.getElementById('editorTurno');
   const editorMetros = document.getElementById('editorMetros');
+  const turnoButtons = editor.querySelectorAll('.turno-buttons button');
 
   function updateMetrosState() {
     if (editorTurno.value === '') {
@@ -167,7 +168,27 @@ function initEditor() {
     }
   }
 
-  editorTurno.addEventListener('change', updateMetrosState);
+  function updateActiveButton(turno) {
+    turnoButtons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.turno === turno);
+    });
+  }
+
+  // Click en botones de turno
+  turnoButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const turno = btn.dataset.turno;
+      editorTurno.value = turno;
+      updateActiveButton(turno);
+      updateMetrosState();
+    });
+  });
+
+  // Cambio manual del select (fallback)
+  editorTurno.addEventListener('change', () => {
+    updateActiveButton(editorTurno.value);
+    updateMetrosState();
+  });
 
   document.getElementById('cancelDay')?.addEventListener('click', () => {
     editor.classList.add('hidden');
@@ -196,6 +217,7 @@ function initEditor() {
         editorTurno.value = r.turno ?? '';
         editorMetros.value = r.metros ?? '';
       }
+      updateActiveButton(editorTurno.value);
       updateMetrosState();
     });
 
