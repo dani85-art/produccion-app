@@ -38,31 +38,32 @@
   </section>
 
   <button id="openCycle">Calcular productividad</button>
-<!-- ===== RESULTADO DEL CICLO ===== -->
-<section id="cycleResult" class="hidden">
-  <h3>Resultado del ciclo</h3>
 
-  <div class="cycle-row">
-    <span>Metros realizados</span>
-    <strong id="cycleTotal">0 m</strong>
-  </div>
+  <!-- ===== RESULTADO DEL CICLO ===== -->
+  <section id="cycleResult" class="hidden">
+    <h3>Resultado del ciclo</h3>
 
-  <div class="cycle-row">
-    <span>Días computables</span>
-    <strong id="cycleDays">0</strong>
-  </div>
+    <div class="cycle-row">
+      <span>Metros realizados</span>
+      <strong id="cycleTotal">0 m</strong>
+    </div>
 
-  <div class="cycle-row">
-    <span>Objetivo del ciclo</span>
-    <strong id="cycleTarget">0 m</strong>
-  </div>
+    <div class="cycle-row">
+      <span>Días computables</span>
+      <strong id="cycleDays">0</strong>
+    </div>
 
-  <div class="cycle-row">
-    <span>Excedente</span>
-    <strong id="cycleExcess">0 m</strong>
-  </div>
-</section>
-<!-- ===== FIN RESULTADO ===== -->
+    <div class="cycle-row">
+      <span>Objetivo del ciclo</span>
+      <strong id="cycleTarget">0 m</strong>
+    </div>
+
+    <div class="cycle-row">
+      <span>Excedente</span>
+      <strong id="cycleExcess">0 m</strong>
+    </div>
+  </section>
+  <!-- ===== FIN RESULTADO ===== -->
 
 
   <!-- ===== EDITOR DE DÍA ===== -->
@@ -72,16 +73,27 @@
 
       <label>
         Turno:
-        <select id="editorTurno">
-  <option value="">— Sin turno —</option>
-  <option value="M">Mañana</option>
-  <option value="T">Tarde</option>
-  <option value="N">Noche</option>
-  <option value="D">Descanso</option>
-  <option value="V">Vacaciones</option>
-</select>
-
       </label>
+
+      <!-- BOTONES DE TURNO -->
+      <div id="turnoButtons" class="turno-buttons">
+        <button type="button" data-turno="">—</button>
+        <button type="button" data-turno="M">M</button>
+        <button type="button" data-turno="T">T</button>
+        <button type="button" data-turno="N">N</button>
+        <button type="button" data-turno="D">D</button>
+        <button type="button" data-turno="V">V</button>
+      </div>
+
+      <!-- SELECT DE RESPALDO (por ahora se queda) -->
+      <select id="editorTurno">
+        <option value="">— Sin turno —</option>
+        <option value="M">Mañana</option>
+        <option value="T">Tarde</option>
+        <option value="N">Noche</option>
+        <option value="D">Descanso</option>
+        <option value="V">Vacaciones</option>
+      </select>
 
       <label>
         Metros:
