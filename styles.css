@@ -166,7 +166,7 @@ body {
   width: 100%;
   margin-top: 4px;
   padding: 6px;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .editor-buttons {
@@ -234,3 +234,4 @@ body {
   background: #e0e7ff;
   border-color: #5c7cfa;
 }
+
