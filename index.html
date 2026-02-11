@@ -2,13 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximun-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+  >
 
   <title>Producción</title>
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#1C1C1E">
+  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
 
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -65,17 +69,13 @@
   </section>
   <!-- ===== FIN RESULTADO ===== -->
 
-
   <!-- ===== EDITOR DE DÍA ===== -->
   <div id="dayEditor" class="editor hidden">
     <div>
       <h3 id="editorDate"></h3>
 
-      <label>
-        Turno:
-      </label>
+      <label>Turno:</label>
 
-      <!-- BOTONES DE TURNO -->
       <div id="turnoButtons" class="turno-buttons">
         <button type="button" data-turno="">—</button>
         <button type="button" data-turno="M">M</button>
@@ -85,7 +85,6 @@
         <button type="button" data-turno="V">V</button>
       </div>
 
-      <!-- SELECT DE RESPALDO (por ahora se queda) -->
       <select id="editorTurno">
         <option value="">— Sin turno —</option>
         <option value="M">Mañana</option>
@@ -142,4 +141,3 @@
 
 </body>
 </html>
-
