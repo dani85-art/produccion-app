@@ -1,4 +1,4 @@
-const CACHE_NAME = 'produccion-v6-color';
+const CACHE_NAME = 'produccion-v6-fuente';
 
 const FILES_TO_CACHE = [
   './',
