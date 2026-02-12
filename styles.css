@@ -1,6 +1,16 @@
 /* ===== Base ===== */
 body {
-  font-family: system-ui, sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
   margin: 0;
   padding: 0;
   background: #f4f6f8;
