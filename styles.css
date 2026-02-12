@@ -80,8 +80,8 @@ body {
 
 /* ===== Colores por turno (más contraste) ===== */
 .turno-M {
-  background: #e1f0ff;
-  border-color: #6ea8fe;
+  background: #e6f4ea;
+  border-color: #4caf50;
 }
 
 .turno-T {
@@ -100,8 +100,8 @@ body {
 
 
 .turno-V {
-  background: #e6f4ea;
-  border-color: #4caf50;
+  background: #e1f0ff;
+  border-color: #8a8f98;
 }
 
 /* ===== Resumen mensual ===== */
@@ -234,4 +234,5 @@ body {
   background: #e0e7ff;
   border-color: #5c7cfa;
 }
+
 
