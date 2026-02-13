@@ -21,7 +21,12 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 6px 10px;
+}
+#monthLabel {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
 }
 
 /* ===== Días de la semana ===== */
@@ -116,12 +121,13 @@ body {
 
 /* ===== Resumen mensual ===== */
 #monthSummary {
-  padding: 10px;
+  margin-top: 4px
+  padding: 6px 0;
   text-align: center;
 }
 
 .summary-value {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: #000;
 }
@@ -244,5 +250,27 @@ body {
   background: #e0e7ff;
   border-color: #5c7cfa;
 }
+#openCycle {
+  display: block;
+  width: calc(100% - 20px);
+  margin: 8px auto 12px auto;
+  padding: 10px 0;
+
+  border-radius: 14px;
+  border: none;
+
+  background: #e9ecef;
+  color: #111;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+#openCycle:active {
+  background: #dcdfe3;
+}
+.day.today {
+  box-shadow: 0 0 0 2px #333 inset;
+}
+
 
 
