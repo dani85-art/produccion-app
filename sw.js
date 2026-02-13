@@ -1,4 +1,4 @@
-const CACHE_NAME = 'produccion-v6-fuente';
+const CACHE_NAME = 'produccion-v6-stylos';
 
 const FILES_TO_CACHE = [
   './',
@@ -35,5 +35,6 @@ self.addEventListener('fetch', e => {
     caches.match(e.request).then(res => res || fetch(e.request))
   );
 });
+
 
 
