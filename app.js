@@ -87,6 +87,16 @@ function renderCalendar() {
         }
       }
 
+      const today = new Date();
+
+      if (
+        year === today.getFullYear() &&
+        month === today.getMonth() &&
+        day === today.getDate()
+      ) {
+        cell.classList.add('today');
+      }
+
       cell.addEventListener('click', () => openEditor(fecha));
       cal.appendChild(cell);
     }
@@ -323,3 +333,4 @@ function initCycleSelector() {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js');
 }
+
