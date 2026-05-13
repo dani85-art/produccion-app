@@ -1,3 +1,272 @@
+/* ===== Base ===== */
+body {
+ font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  margin: 0;
+  padding: 0;
+  background: #f4f6f8;
+  color: #111;
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+}
+#monthLabel {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ===== Días de la semana ===== */
+#weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  padding: 0 10px;
+  text-align: center;
+  font-weight: 700;
+  color: #222;
+}
+
+#weekdays div {
+  padding: 6px 0;
+}
+
+/* ===== Calendario ===== */
+#calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  padding: 10px;
+}
+
+.day {
+  background: #ffffff;
+  border: 1px solid #bfc5cc;
+  border-radius: 6px;
+  min-height: 80px;
+  padding: 6px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.day.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.day-number {
+  font-weight: 700;
+  font-size: 14px;
+  color: #111;
+}
+
+.day-turno {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111;
+}
+
+.day-metros {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0d47a1;
+}
+
+/* ===== Colores por turno ===== */
+.turno-M {
+  background: #e6f4ea;
+  border-color: #4caf50;
+}
+
+.turno-T {
+  background: #fff3e0;
+  border-color: #ffb74d;
+}
+
+.turno-N {
+  background: #ede7f6;
+  border-color: #7e57c2;
+}
+
+.turno-D {
+  background: #eef1f4;
+  border-color: #8a8f98;
+}
+
+.turno-V {
+  background: #e1f0ff;
+  border-color: #6ea8fe;
+}
+
+/* ===== Resumen mensual ===== */
+#monthSummary {
+  margin-top: 4px;
+  padding: 6px 0;
+  text-align: center;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #000;
+}
+
+.excedente-pos {
+  color: #1b7f3a;
+  font-weight: 700;
+}
+
+.excedente-neg {
+  color: #b3261e;
+  font-weight: 700;
+}
+
+.excedente-neu {
+  color: #333;
+  font-weight: 600;
+}
+
+/* ===== Editor de día ===== */
+.editor {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.editor.hidden {
+  display: none;
+}
+
+.editor > div {
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  width: 260px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.editor label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #111;
+}
+
+.editor input,
+.editor select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px;
+  font-size: 16px;
+}
+
+.editor-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+#editorMetros:disabled {
+  background-color: #e0e0e0;
+  color: #777;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* ===== Resultado de ciclo ===== */
+#cycleResult {
+  margin: 12px;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  text-align: center;
+}
+
+#cycleResult.hidden {
+  display: none;
+}
+
+#cycleResult h3 {
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.cycle-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+  font-weight: 600;
+}
+
+/* ===== Botones de turno ===== */
+.turno-buttons {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.turno-buttons button {
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 6px;
+  border: 1px solid #bfc5cc;
+  background: #f5f7fa;
+  color: #111;
+  cursor: pointer;
+}
+
+.turno-buttons button:active {
+  transform: scale(0.97);
+}
+
+.turno-buttons button.active {
+  background: #e0e7ff;
+  border-color: #5c7cfa;
+}
+
+#openCycle {
+  display: block;
+  width: calc(100% - 20px);
+  margin: 8px auto 12px auto;
+  padding: 10px 0;
+  border-radius: 14px;
+  border: none;
+  background: #e9ecef;
+  color: #111;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+#openCycle:active {
+  background: #dcdfe3;
+}
+
+.day.today {
+  box-shadow: 0 0 0 2px #333 inset;
+}
+
 /* ===== Manitou ===== */
 .day-manitou {
   font-size: 11px;
