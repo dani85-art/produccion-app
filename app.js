@@ -82,7 +82,7 @@ function renderCalendar() {
         cell.classList.add(`turno-${r.turno}`);
         cell.innerHTML += `<div class="day-turno">${r.turno}</div>`;
 
-        if (!r.manitou && r.metros !== '' && r.metros !== null) {
+        if (r.metros !== '' && r.metros !== null) {
           cell.innerHTML += `<div class="day-metros">${r.metros} m</div>`;
         }
 
@@ -188,7 +188,7 @@ function initEditor() {
   const turnoButtons = editor.querySelectorAll('.turno-buttons button');
 
   function updateMetrosState() {
-    if (editorTurno.value === '' || editorManitou.checked) {
+    if (editorTurno.value === '') {
       editorMetros.value = '';
       editorMetros.disabled = true;
     } else {
@@ -228,7 +228,7 @@ function initEditor() {
     saveDay({
       fecha: editingFecha,
       turno: editorTurno.value,
-      metros: editorManitou.checked ? '' : editorMetros.value.trim(),
+      metros: editorMetros.value.trim(),
       manitou: editorManitou.checked
     }).then(() => {
       editor.classList.add('hidden');
