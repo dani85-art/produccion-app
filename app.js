@@ -82,13 +82,16 @@ function renderCalendar() {
         cell.classList.add(`turno-${r.turno}`);
         cell.innerHTML += `<div class="day-turno">${r.turno}</div>`;
 
-        if (r.metros !== '' && r.metros !== null) {
+        if (!r.manitou && r.metros !== '' && r.metros !== null) {
           cell.innerHTML += `<div class="day-metros">${r.metros} m</div>`;
+        }
+
+        if (r.manitou) {
+          cell.innerHTML += `<div class="day-manitou">MAN</div>`;
         }
       }
 
       const today = new Date();
-
       if (
         year === today.getFullYear() &&
         month === today.getMonth() &&
@@ -118,10 +121,14 @@ function isSameMonth(dateStr, year, month) {
 function calcularResumenMensual(registros, year, month) {
   let metros = 0;
   let diasTrabajados = 0;
+  let diasManitou = 0;
 
   registros.forEach(r => {
-    if (
-      isSameMonth(r.fecha, year, month) &&
+    if (!isSameMonth(r.fecha, year, month)) return;
+
+    if (r.manitou) {
+      diasManitou++;
+    } else if (
       turnoCuenta(r.turno) &&
       r.metros !== '' &&
       r.metros !== null
@@ -133,13 +140,15 @@ function calcularResumenMensual(registros, year, month) {
 
   return {
     metros,
-    excedente: metros - diasTrabajados * OBJETIVO_DIARIO
+    excedente: metros - diasTrabajados * OBJETIVO_DIARIO,
+    diasManitou
   };
 }
 
 function renderResumenMensual(resumen) {
   const totalEl = document.getElementById('monthTotal');
   const excEl = document.getElementById('monthExcess');
+  const manitouEl = document.getElementById('monthManitou');
 
   totalEl.textContent = `${resumen.metros.toFixed(1)} m`;
 
@@ -154,6 +163,14 @@ function renderResumenMensual(resumen) {
     excEl.classList.add('excedente-neu');
     excEl.textContent = `0.0 m`;
   }
+
+  if (resumen.diasManitou > 0) {
+    manitouEl.textContent = `Manitou: ${resumen.diasManitou} día${resumen.diasManitou > 1 ? 's' : ''}`;
+    manitouEl.style.display = 'block';
+  } else {
+    manitouEl.textContent = '';
+    manitouEl.style.display = 'none';
+  }
 }
 
 /* =======================
@@ -167,10 +184,11 @@ function initEditor() {
   const editorDate = document.getElementById('editorDate');
   const editorTurno = document.getElementById('editorTurno');
   const editorMetros = document.getElementById('editorMetros');
+  const editorManitou = document.getElementById('editorManitou');
   const turnoButtons = editor.querySelectorAll('.turno-buttons button');
 
   function updateMetrosState() {
-    if (editorTurno.value === '') {
+    if (editorTurno.value === '' || editorManitou.checked) {
       editorMetros.value = '';
       editorMetros.disabled = true;
     } else {
@@ -184,7 +202,6 @@ function initEditor() {
     });
   }
 
-  // Click en botones de turno
   turnoButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const turno = btn.dataset.turno;
@@ -194,9 +211,12 @@ function initEditor() {
     });
   });
 
-  // Cambio manual del select (fallback)
   editorTurno.addEventListener('change', () => {
     updateActiveButton(editorTurno.value);
+    updateMetrosState();
+  });
+
+  editorManitou.addEventListener('change', () => {
     updateMetrosState();
   });
 
@@ -208,7 +228,8 @@ function initEditor() {
     saveDay({
       fecha: editingFecha,
       turno: editorTurno.value,
-      metros: editorMetros.value.trim()
+      metros: editorManitou.checked ? '' : editorMetros.value.trim(),
+      manitou: editorManitou.checked
     }).then(() => {
       editor.classList.add('hidden');
       renderCalendar();
@@ -220,12 +241,14 @@ function initEditor() {
     editorDate.textContent = fecha;
     editorTurno.value = '';
     editorMetros.value = '';
+    editorManitou.checked = false;
 
     getAllDays().then(registros => {
       const r = registros.find(x => x.fecha === fecha);
       if (r) {
         editorTurno.value = r.turno ?? '';
         editorMetros.value = r.metros ?? '';
+        editorManitou.checked = r.manitou ?? false;
       }
       updateActiveButton(editorTurno.value);
       updateMetrosState();
@@ -242,11 +265,14 @@ function initEditor() {
 function calcularResumenCiclo(registros, inicio, fin) {
   let metros = 0;
   let dias = 0;
+  let diasManitou = 0;
 
   registros.forEach(r => {
-    if (
-      r.fecha >= inicio &&
-      r.fecha <= fin &&
+    if (r.fecha < inicio || r.fecha > fin) return;
+
+    if (r.manitou) {
+      diasManitou++;
+    } else if (
       turnoCuenta(r.turno) &&
       r.metros !== '' &&
       r.metros !== null
@@ -262,7 +288,8 @@ function calcularResumenCiclo(registros, inicio, fin) {
     metros,
     dias,
     objetivo,
-    excedente: metros - objetivo
+    excedente: metros - objetivo,
+    diasManitou
   };
 }
 
@@ -308,10 +335,12 @@ function initCycleSelector() {
       const daysEl = document.getElementById('cycleDays');
       const targetEl = document.getElementById('cycleTarget');
       const excEl = document.getElementById('cycleExcess');
+      const manitouEl = document.getElementById('cycleManitou');
 
       totalEl.textContent = `${resumen.metros.toFixed(1)} m`;
       daysEl.textContent = resumen.dias;
       targetEl.textContent = `${resumen.objetivo.toFixed(1)} m`;
+      manitouEl.textContent = resumen.diasManitou;
 
       excEl.className = '';
       if (resumen.excedente > 0) {
@@ -333,4 +362,3 @@ function initCycleSelector() {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js');
 }
-
