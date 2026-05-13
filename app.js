@@ -22,10 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCalendar();
 });
 
-/* =======================
-   NAVEGACIÓN MESES
-======================= */
-
 function initMonthNavigation() {
   document.getElementById('prevMonth')?.addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
@@ -37,10 +33,6 @@ function initMonthNavigation() {
     renderCalendar();
   });
 }
-
-/* =======================
-   CALENDARIO
-======================= */
 
 function renderCalendar() {
   const cal = document.getElementById('calendar');
@@ -109,10 +101,6 @@ function renderCalendar() {
   });
 }
 
-/* =======================
-   CÁLCULOS MENSUALES
-======================= */
-
 function isSameMonth(dateStr, year, month) {
   const [y, m] = dateStr.split('-').map(Number);
   return y === year && m - 1 === month;
@@ -126,9 +114,9 @@ function calcularResumenMensual(registros, year, month) {
   registros.forEach(r => {
     if (!isSameMonth(r.fecha, year, month)) return;
 
-    if (r.manitou) {
-      diasManitou++;
-    } else if (
+    if (r.manitou) diasManitou++;
+
+    if (
       turnoCuenta(r.turno) &&
       r.metros !== '' &&
       r.metros !== null
@@ -173,10 +161,6 @@ function renderResumenMensual(resumen) {
   }
 }
 
-/* =======================
-   EDITOR DE DÍA
-======================= */
-
 function initEditor() {
   const editor = document.getElementById('dayEditor');
   if (!editor) return;
@@ -213,10 +197,6 @@ function initEditor() {
 
   editorTurno.addEventListener('change', () => {
     updateActiveButton(editorTurno.value);
-    updateMetrosState();
-  });
-
-  editorManitou.addEventListener('change', () => {
     updateMetrosState();
   });
 
@@ -258,10 +238,6 @@ function initEditor() {
   };
 }
 
-/* =======================
-   CÁLCULO DE CICLO
-======================= */
-
 function calcularResumenCiclo(registros, inicio, fin) {
   let metros = 0;
   let dias = 0;
@@ -270,9 +246,9 @@ function calcularResumenCiclo(registros, inicio, fin) {
   registros.forEach(r => {
     if (r.fecha < inicio || r.fecha > fin) return;
 
-    if (r.manitou) {
-      diasManitou++;
-    } else if (
+    if (r.manitou) diasManitou++;
+
+    if (
       turnoCuenta(r.turno) &&
       r.metros !== '' &&
       r.metros !== null
@@ -292,10 +268,6 @@ function calcularResumenCiclo(registros, inicio, fin) {
     diasManitou
   };
 }
-
-/* =======================
-   SELECTOR DE CICLO
-======================= */
 
 function initCycleSelector() {
   const openBtn = document.getElementById('openCycle');
