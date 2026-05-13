@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMonthNavigation();
   initEditor();
   initCycleSelector();
+  initBackup();
   renderCalendar();
 });
 
@@ -328,6 +329,52 @@ function initCycleSelector() {
       box.classList.remove('hidden');
       modal.classList.add('hidden');
     });
+  });
+}
+
+/* =======================
+   BACKUP
+======================= */
+
+function initBackup() {
+  document.getElementById('exportBackup')?.addEventListener('click', () => {
+    getAllDays().then(registros => {
+      const json = JSON.stringify(registros, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backup-produccion-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  });
+
+  document.getElementById('importBackup')?.addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile')?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const registros = JSON.parse(ev.target.result);
+        if (!Array.isArray(registros)) throw new Error();
+
+        if (!confirm(`¿Importar ${registros.length} registros? Esto sobreescribirá los datos actuales.`)) return;
+
+        Promise.all(registros.map(r => saveDay(r))).then(() => {
+          alert('Backup importado correctamente');
+          renderCalendar();
+        });
+      } catch {
+        alert('El archivo no es válido');
+      }
+    };
+    reader.readAsText(file);
   });
 }
 
