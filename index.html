@@ -2,18 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Producción</title>
-
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1C1C1E">
-  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
-
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -25,69 +17,40 @@
   </header>
 
   <section id="weekdays">
-    <div>L</div>
-    <div>M</div>
-    <div>X</div>
-    <div>J</div>
-    <div>V</div>
-    <div>S</div>
-    <div>D</div>
+    <div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div>
   </section>
 
   <section id="calendar"></section>
 
+  <!-- Resumen Mensual (Sin excedente según especificaciones) -->
   <section id="monthSummary">
     <div class="summary-value" id="monthTotal">0 m</div>
-    <div class="summary-excess excedente-neu" id="monthExcess">0 m</div>
     <div class="summary-manitou" id="monthManitou"></div>
   </section>
 
+  <!-- Resultado del Ciclo (Bloque Fijo) -->
+  <section id="cycleResult">
+    <h3>Resultado del ciclo</h3>
+    <div class="cycle-row"><span>Metros realizados</span><strong id="cycleTotal">0 m</strong></div>
+    <div class="cycle-row"><span>Días computables</span><strong id="cycleDays">0</strong></div>
+    <div class="cycle-row"><span>Objetivo del ciclo</span><strong id="cycleTarget">0 m</strong></div>
+    <div class="cycle-row"><span>Excedente</span><strong id="cycleExcess">0 m</strong></div>
+    <div class="cycle-row"><span>Días manitou</span><strong id="cycleManitou">0</strong></div>
+  </section>
+
+  <button id="openCycle">Seleccionar ciclo</button>
+
   <div id="backupButtons">
-    <button id="exportBackup">📥 Exportar backup</button>
-    <button id="importBackup">📤 Importar backup</button>
+    <button id="exportBackup">📥 Exportar</button>
+    <button id="importBackup">📤 Importar</button>
     <input type="file" id="importFile" accept=".json" style="display:none">
   </div>
 
-  <button id="openCycle">Calcular productividad</button>
-
-  <!-- ===== RESULTADO DEL CICLO ===== -->
-  <section id="cycleResult" class="hidden">
-    <h3>Resultado del ciclo</h3>
-
-    <div class="cycle-row">
-      <span>Metros realizados</span>
-      <strong id="cycleTotal">0 m</strong>
-    </div>
-
-    <div class="cycle-row">
-      <span>Días computables</span>
-      <strong id="cycleDays">0</strong>
-    </div>
-
-    <div class="cycle-row">
-      <span>Objetivo del ciclo</span>
-      <strong id="cycleTarget">0 m</strong>
-    </div>
-
-    <div class="cycle-row">
-      <span>Días manitou</span>
-      <strong id="cycleManitou">0</strong>
-    </div>
-
-    <div class="cycle-row">
-      <span>Excedente</span>
-      <strong id="cycleExcess">0 m</strong>
-    </div>
-  </section>
-  <!-- ===== FIN RESULTADO ===== -->
-
-  <!-- ===== EDITOR DE DÍA ===== -->
+  <!-- EDITOR DE DÍA -->
   <div id="dayEditor" class="editor hidden">
     <div>
       <h3 id="editorDate"></h3>
-
       <label>Turno:</label>
-
       <div id="turnoButtons" class="turno-buttons">
         <button type="button" data-turno="">—</button>
         <button type="button" data-turno="M">M</button>
@@ -96,65 +59,30 @@
         <button type="button" data-turno="D">D</button>
         <button type="button" data-turno="V">V</button>
       </div>
-
-      <select id="editorTurno">
-        <option value="">— Sin turno —</option>
-        <option value="M">Mañana</option>
-        <option value="T">Tarde</option>
-        <option value="N">Noche</option>
-        <option value="D">Descanso</option>
-        <option value="V">Vacaciones</option>
-      </select>
-
-      <label class="manitou-label">
-        <input type="checkbox" id="editorManitou">
-        Manitou
-      </label>
-
-      <label>
-        Metros:
-        <input
-          type="number"
-          id="editorMetros"
-          step="0.1"
-          min="0"
-          inputmode="decimal"
-        >
-      </label>
-
+      <label class="manitou-label"><input type="checkbox" id="editorManitou"> Manitou</label>
+      <label>Metros:</label>
+      <input type="number" id="editorMetros" step="0.1" min="0" inputmode="decimal">
       <div class="editor-buttons">
         <button id="saveDay">Guardar</button>
         <button id="cancelDay">Cancelar</button>
       </div>
     </div>
   </div>
-  <!-- ===== FIN EDITOR ===== -->
 
-  <!-- ===== SELECTOR DE CICLO ===== -->
+  <!-- SELECTOR DE CICLO -->
   <div id="cycleSelector" class="editor hidden">
     <div>
       <h3>Seleccionar ciclo</h3>
-
-      <label>
-        Fecha inicio:
-        <input type="date" id="cycleStart">
-      </label>
-
-      <label>
-        Fecha fin:
-        <input type="date" id="cycleEnd">
-      </label>
-
+      <label>Inicio:<input type="date" id="cycleStart"></label>
+      <label>Fin:<input type="date" id="cycleEnd"></label>
       <div class="editor-buttons">
         <button id="applyCycle">Aplicar</button>
         <button id="cancelCycle">Cancelar</button>
       </div>
     </div>
   </div>
-  <!-- ===== FIN SELECTOR ===== -->
 
   <script src="db.js" defer></script>
   <script src="app.js" defer></script>
-
 </body>
 </html>
