@@ -14,6 +14,7 @@ function turnoCuenta(turno) {
 
 let currentDate = new Date();
 let editingFecha = null;
+let selectedTurno = ''; // Variable para almacenar el turno seleccionado en el modal
 
 document.addEventListener('DOMContentLoaded', () => {
   initMonthNavigation();
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCycleSelector();
   initBackup();
   renderCalendar();
+  loadCycleDates();
 });
 
 function initMonthNavigation() {
@@ -28,7 +30,6 @@ function initMonthNavigation() {
     currentDate.setMonth(currentDate.getMonth() - 1);
     renderCalendar();
   });
-
   document.getElementById('nextMonth')?.addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() + 1);
     renderCalendar();
@@ -38,7 +39,6 @@ function initMonthNavigation() {
 function renderCalendar() {
   const cal = document.getElementById('calendar');
   cal.innerHTML = '';
-
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
@@ -48,7 +48,6 @@ function renderCalendar() {
   const firstDay = new Date(year, month, 1);
   let startWeekDay = firstDay.getDay();
   startWeekDay = startWeekDay === 0 ? 6 : startWeekDay - 1;
-
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   getAllDays().then(registros => {
@@ -64,41 +63,26 @@ function renderCalendar() {
     for (let day = 1; day <= daysInMonth; day++) {
       const cell = document.createElement('div');
       cell.className = 'day';
-
       const fecha = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       cell.dataset.fecha = fecha;
-
       cell.innerHTML = `<div class="day-number">${day}</div>`;
 
       const r = map[fecha];
       if (r && r.turno) {
         cell.classList.add(`turno-${r.turno}`);
         cell.innerHTML += `<div class="day-turno">${r.turno}</div>`;
-
         if (r.metros !== '' && r.metros !== null) {
-          cell.innerHTML += `<div class="day-metros">${r.metros} m</div>`;
+          cell.innerHTML += `<div class="day-metros">${r.metros}</div>`;
         }
-
-        if (r.manitou) {
-          cell.innerHTML += `<div class="day-manitou">MAN</div>`;
-        }
+        if (r.manitou) cell.innerHTML += `<div class="day-manitou">MAN</div>`;
       }
-
+      
       const today = new Date();
-      if (
-        year === today.getFullYear() &&
-        month === today.getMonth() &&
-        day === today.getDate()
-      ) {
-        cell.classList.add('today');
-      }
-
+      if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) cell.classList.add('today');
       cell.addEventListener('click', () => openEditor(fecha));
       cal.appendChild(cell);
     }
-
-    const resumen = calcularResumenMensual(registros, year, month);
-    renderResumenMensual(resumen);
+    renderResumenMensual(calcularResumenMensual(registros, year, month));
   });
 }
 
@@ -111,53 +95,24 @@ function calcularResumenMensual(registros, year, month) {
   let metros = 0;
   let diasTrabajados = 0;
   let diasManitou = 0;
-
   registros.forEach(r => {
     if (!isSameMonth(r.fecha, year, month)) return;
-
     if (r.manitou) diasManitou++;
-
-    if (
-      turnoCuenta(r.turno) &&
-      r.metros !== '' &&
-      r.metros !== null
-    ) {
+    if (turnoCuenta(r.turno) && r.metros !== '' && r.metros !== null) {
       diasTrabajados++;
       metros += Number(r.metros);
     }
   });
-
-  return {
-    metros,
-    excedente: metros - diasTrabajados * OBJETIVO_DIARIO,
-    diasManitou
-  };
+  return { metros, diasManitou };
 }
 
 function renderResumenMensual(resumen) {
-  const totalEl = document.getElementById('monthTotal');
-  const excEl = document.getElementById('monthExcess');
+  document.getElementById('monthTotal').textContent = `${resumen.metros.toFixed(1)} m`;
   const manitouEl = document.getElementById('monthManitou');
-
-  totalEl.textContent = `${resumen.metros.toFixed(1)} m`;
-
-  excEl.className = 'summary-excess';
-  if (resumen.excedente > 0) {
-    excEl.classList.add('excedente-pos');
-    excEl.textContent = `+${resumen.excedente.toFixed(1)} m`;
-  } else if (resumen.excedente < 0) {
-    excEl.classList.add('excedente-neg');
-    excEl.textContent = `${resumen.excedente.toFixed(1)} m`;
-  } else {
-    excEl.classList.add('excedente-neu');
-    excEl.textContent = `0.0 m`;
-  }
-
   if (resumen.diasManitou > 0) {
     manitouEl.textContent = `Manitou: ${resumen.diasManitou} día${resumen.diasManitou > 1 ? 's' : ''}`;
     manitouEl.style.display = 'block';
   } else {
-    manitouEl.textContent = '';
     manitouEl.style.display = 'none';
   }
 }
@@ -167,21 +122,12 @@ function initEditor() {
   if (!editor) return;
 
   const editorDate = document.getElementById('editorDate');
-  const editorTurno = document.getElementById('editorTurno');
   const editorMetros = document.getElementById('editorMetros');
   const editorManitou = document.getElementById('editorManitou');
   const turnoButtons = editor.querySelectorAll('.turno-buttons button');
 
-  function updateMetrosState() {
-    if (editorTurno.value === '') {
-      editorMetros.value = '';
-      editorMetros.disabled = true;
-    } else {
-      editorMetros.disabled = false;
-    }
-  }
-
   function updateActiveButton(turno) {
+    selectedTurno = turno;
     turnoButtons.forEach(btn => {
       btn.classList.toggle('active', btn.dataset.turno === turno);
     });
@@ -189,195 +135,120 @@ function initEditor() {
 
   turnoButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      const turno = btn.dataset.turno;
-      editorTurno.value = turno;
-      updateActiveButton(turno);
-      updateMetrosState();
+      updateActiveButton(btn.dataset.turno);
     });
   });
 
-  editorTurno.addEventListener('change', () => {
-    updateActiveButton(editorTurno.value);
-    updateMetrosState();
-  });
-
-  document.getElementById('cancelDay')?.addEventListener('click', () => {
-    editor.classList.add('hidden');
-  });
-
+  document.getElementById('cancelDay')?.addEventListener('click', () => editor.classList.add('hidden'));
+  
   document.getElementById('saveDay')?.addEventListener('click', () => {
-    saveDay({
-      fecha: editingFecha,
-      turno: editorTurno.value,
-      metros: editorMetros.value.trim(),
-      manitou: editorManitou.checked
+    saveDay({ 
+      fecha: editingFecha, 
+      turno: selectedTurno, 
+      metros: editorMetros.value.trim(), 
+      manitou: editorManitou.checked 
     }).then(() => {
       editor.classList.add('hidden');
       renderCalendar();
+      const start = document.getElementById('cycleStart').value;
+      const end = document.getElementById('cycleEnd').value;
+      if (start && end) calculateAndShowCycle(start, end);
     });
   });
 
   window.openEditor = function (fecha) {
     editingFecha = fecha;
-    editorDate.textContent = fecha;
-    editorTurno.value = '';
+    const d = new Date(fecha + 'T00:00:00');
+    editorDate.textContent = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    
+    selectedTurno = '';
     editorMetros.value = '';
     editorManitou.checked = false;
 
     getAllDays().then(registros => {
       const r = registros.find(x => x.fecha === fecha);
       if (r) {
-        editorTurno.value = r.turno ?? '';
+        selectedTurno = r.turno ?? '';
         editorMetros.value = r.metros ?? '';
         editorManitou.checked = r.manitou ?? false;
       }
-      updateActiveButton(editorTurno.value);
-      updateMetrosState();
+      updateActiveButton(selectedTurno);
+      editor.classList.remove('hidden');
     });
-
-    editor.classList.remove('hidden');
   };
 }
 
-function calcularResumenCiclo(registros, inicio, fin) {
-  let metros = 0;
-  let dias = 0;
-  let diasManitou = 0;
+function calculateAndShowCycle(start, end) {
+  getAllDays().then(registros => {
+    let metros = 0, dias = 0, diasManitou = 0;
+    registros.forEach(r => {
+      if (r.fecha < start || r.fecha > end) return;
+      if (r.manitou) diasManitou++;
+      if (turnoCuenta(r.turno) && r.metros !== '' && r.metros !== null) {
+        dias++;
+        metros += Number(r.metros);
+      }
+    });
+    const objetivo = dias * OBJETIVO_DIARIO;
+    const excedente = metros - objetivo;
 
-  registros.forEach(r => {
-    if (r.fecha < inicio || r.fecha > fin) return;
-
-    if (r.manitou) diasManitou++;
-
-    if (
-      turnoCuenta(r.turno) &&
-      r.metros !== '' &&
-      r.metros !== null
-    ) {
-      dias++;
-      metros += Number(r.metros);
-    }
+    document.getElementById('cycleTotal').textContent = `${metros.toFixed(1)} m`;
+    document.getElementById('cycleDays').textContent = dias;
+    document.getElementById('cycleTarget').textContent = `${objetivo.toFixed(1)} m`;
+    document.getElementById('cycleManitou').textContent = diasManitou;
+    
+    const excEl = document.getElementById('cycleExcess');
+    excEl.className = '';
+    excEl.classList.add(excedente > 0 ? 'excedente-pos' : excedente < 0 ? 'excedente-neg' : 'excedente-neu');
+    excEl.textContent = `${excedente > 0 ? '+' : ''}${excedente.toFixed(1)} m`;
+    document.getElementById('cycleResult').classList.remove('hidden');
   });
-
-  const objetivo = dias * OBJETIVO_DIARIO;
-
-  return {
-    metros,
-    dias,
-    objetivo,
-    excedente: metros - objetivo,
-    diasManitou
-  };
 }
 
 function initCycleSelector() {
-  const openBtn = document.getElementById('openCycle');
-  const modal = document.getElementById('cycleSelector');
-  const startInput = document.getElementById('cycleStart');
-  const endInput = document.getElementById('cycleEnd');
-
-  if (!openBtn || !modal) return;
-
-  openBtn.addEventListener('click', () => {
-    modal.classList.remove('hidden');
-  });
-
-  document.getElementById('cancelCycle')?.addEventListener('click', () => {
-    modal.classList.add('hidden');
-  });
-
+  document.getElementById('openCycle')?.addEventListener('click', () => document.getElementById('cycleSelector').classList.remove('hidden'));
+  document.getElementById('cancelCycle')?.addEventListener('click', () => document.getElementById('cycleSelector').classList.add('hidden'));
   document.getElementById('applyCycle')?.addEventListener('click', () => {
-    const start = startInput.value;
-    const end = endInput.value;
-
-    if (!start || !end) {
-      alert('Selecciona ambas fechas');
-      return;
-    }
-
-    if (start > end) {
-      alert('La fecha inicial no puede ser posterior a la final');
-      return;
-    }
-
-    getAllDays().then(registros => {
-      const resumen = calcularResumenCiclo(registros, start, end);
-
-      const box = document.getElementById('cycleResult');
-      const totalEl = document.getElementById('cycleTotal');
-      const daysEl = document.getElementById('cycleDays');
-      const targetEl = document.getElementById('cycleTarget');
-      const excEl = document.getElementById('cycleExcess');
-      const manitouEl = document.getElementById('cycleManitou');
-
-      totalEl.textContent = `${resumen.metros.toFixed(1)} m`;
-      daysEl.textContent = resumen.dias;
-      targetEl.textContent = `${resumen.objetivo.toFixed(1)} m`;
-      manitouEl.textContent = resumen.diasManitou;
-
-      excEl.className = '';
-      if (resumen.excedente > 0) {
-        excEl.classList.add('excedente-pos');
-        excEl.textContent = `+${resumen.excedente.toFixed(1)} m`;
-      } else if (resumen.excedente < 0) {
-        excEl.classList.add('excedente-neg');
-        excEl.textContent = `${resumen.excedente.toFixed(1)} m`;
-      } else {
-        excEl.textContent = `0.0 m`;
-      }
-
-      box.classList.remove('hidden');
-      modal.classList.add('hidden');
-    });
+    const start = document.getElementById('cycleStart').value;
+    const end = document.getElementById('cycleEnd').value;
+    if (!start || !end) return alert('Selecciona fechas');
+    localStorage.setItem('cycleStart', start);
+    localStorage.setItem('cycleEnd', end);
+    calculateAndShowCycle(start, end);
+    document.getElementById('cycleSelector').classList.add('hidden');
   });
 }
 
-/* =======================
-   BACKUP
-======================= */
+function loadCycleDates() {
+  const start = localStorage.getItem('cycleStart');
+  const end = localStorage.getItem('cycleEnd');
+  if (start && end) {
+    document.getElementById('cycleStart').value = start;
+    document.getElementById('cycleEnd').value = end;
+    calculateAndShowCycle(start, end);
+  }
+}
 
 function initBackup() {
   document.getElementById('exportBackup')?.addEventListener('click', () => {
     getAllDays().then(registros => {
-      const json = JSON.stringify(registros, null, 2);
-      const blob = new Blob([json], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(registros)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `backup-produccion-${new Date().toISOString().slice(0,10)}.json`;
+      a.download = `backup-${new Date().toISOString().slice(0,10)}.json`;
       a.click();
-      URL.revokeObjectURL(url);
     });
   });
-
-  document.getElementById('importBackup')?.addEventListener('click', () => {
-    document.getElementById('importFile').click();
-  });
-
+  document.getElementById('importBackup')?.addEventListener('click', () => document.getElementById('importFile').click());
   document.getElementById('importFile')?.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (ev) => {
-      try {
-        const registros = JSON.parse(ev.target.result);
-        if (!Array.isArray(registros)) throw new Error();
-
-        if (!confirm(`¿Importar ${registros.length} registros? Esto sobreescribirá los datos actuales.`)) return;
-
-        Promise.all(registros.map(r => saveDay(r))).then(() => {
-          alert('Backup importado correctamente');
-          renderCalendar();
-        });
-      } catch {
-        alert('El archivo no es válido');
-      }
+      const regs = JSON.parse(ev.target.result);
+      Promise.all(regs.map(r => saveDay(r))).then(() => renderCalendar());
     };
-    reader.readAsText(file);
+    reader.readAsText(e.target.files[0]);
   });
 }
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js');
-}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
