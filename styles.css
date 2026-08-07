@@ -185,3 +185,15 @@ body {
   box-shadow: 0 0 0 2px #007aff;
   transform: scale(1.02);
 }
+/* Ocultar por completo los espacios de los días vacíos */
+.day.hidden-empty {
+  visibility: hidden;
+  border: none;
+  background: transparent;
+  pointer-events: none;
+}
+/* ===== Resaltar el día actual ===== */
+.day.today {
+  border: 2px solid #007aff !important; /* Borde de color más grueso y llamativo (puedes cambiar el color) */
+  font-weight: bold;
+}
