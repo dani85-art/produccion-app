@@ -56,7 +56,7 @@ function renderCalendar() {
 
     for (let i = 0; i < startWeekDay; i++) {
       const empty = document.createElement('div');
-      empty.className = 'day empty';
+      empty.className = 'day empty hidden-empty';
       cal.appendChild(empty);
     }
 
