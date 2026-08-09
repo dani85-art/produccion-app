@@ -14,7 +14,7 @@ function turnoCuenta(turno) {
 
 let currentDate = new Date();
 let editingFecha = null;
-let selectedTurno = ''; // Variable para almacenar el turno seleccionado en el modal
+let selectedTurno = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   initMonthNavigation();
@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackup();
   renderCalendar();
   loadCycleDates();
+  initSwipeGestures(); 
 });
 
 function initMonthNavigation() {
@@ -181,12 +182,9 @@ function initEditor() {
 function calculateAndShowCycle(start, end) {
   getAllDays().then(registros => {
     let metros = 0, diasTrabajados = 0;
-    
-    // Convertimos las fechas para cálculo
     const startDate = new Date(start + 'T00:00:00');
     const endDate = new Date(end + 'T00:00:00');
     
-    // Calcular días totales del ciclo (incluyendo inicio y fin)
     const diffTime = Math.abs(endDate - startDate);
     const diasTotales = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
@@ -201,24 +199,18 @@ function calculateAndShowCycle(start, end) {
     const objetivoTotal = diasTotales * OBJETIVO_DIARIO;
     const excedente = metros - objetivoTotal;
 
-    // Formateo de fechas con meses enteros
     const formatOpts = { day: 'numeric', month: 'long' };
-    const inicioStr = startDate.toLocaleDateString('es-ES', formatOpts);
-    const finStr = endDate.toLocaleDateString('es-ES', formatOpts);
-
-    // Actualización del DOM
-    // Nota: Asegúrate de que tu HTML tenga estos IDs o similares
+    document.getElementById('cyclePeriod').textContent = `${startDate.toLocaleDateString('es-ES', formatOpts)} al ${endDate.toLocaleDateString('es-ES', formatOpts)}`;
+    document.getElementById('cycleTotalDays').textContent = diasTotales;
+    document.getElementById('cycleTarget').textContent = `${objetivoTotal.toFixed(1)} m`;
     document.getElementById('cycleTotal').textContent = `${metros.toFixed(1)} m`;
+    document.getElementById('cycleDays').textContent = diasTrabajados;
     
-    document.getElementById('cycleResult').innerHTML = `
-      <div class="fila-dato"><span>Periodo del ciclo:</span> <strong>${inicioStr} al ${finStr}</strong></div>
-      <div class="fila-dato"><span>Días totales del ciclo:</span> <strong>${diasTotales}</strong></div>
-      <div class="fila-dato"><span>Objetivo total del ciclo:</span> <strong>${objetivoTotal.toFixed(1)} m</strong></div>
-      <div class="fila-dato"><span>Metros realizados:</span> <strong>${metros.toFixed(1)} m</strong></div>
-      <div class="fila-dato"><span>Días trabajados:</span> <strong>${diasTrabajados}</strong></div>
-      <div class="fila-dato"><span>Excedente:</span> <strong>${excedente > 0 ? '+' : ''}${excedente.toFixed(1)} m</strong></div>
-    `;
-
+    const excEl = document.getElementById('cycleExcess');
+    excEl.className = '';
+    excEl.classList.add(excedente > 0 ? 'excedente-pos' : excedente < 0 ? 'excedente-neg' : 'excedente-neu');
+    excEl.textContent = `${excedente > 0 ? '+' : ''}${excedente.toFixed(1)} m`;
+    
     document.getElementById('cycleResult').classList.remove('hidden');
   });
 }
@@ -269,28 +261,20 @@ function initBackup() {
   });
 }
 
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
-
 function initSwipeGestures() {
   let touchStartX = 0;
   const cal = document.getElementById('calendar');
-
   cal.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
-  
   cal.addEventListener('touchend', e => {
     let touchEndX = e.changedTouches[0].screenX;
-    if (touchEndX < touchStartX - 50) { // Desliza a la izquierda (avanza mes)
+    if (touchEndX < touchStartX - 50) {
       currentDate.setMonth(currentDate.getMonth() + 1);
       renderCalendar();
-    } else if (touchEndX > touchStartX + 50) { // Desliza a la derecha (retrocede mes)
+    } else if (touchEndX > touchStartX + 50) {
       currentDate.setMonth(currentDate.getMonth() - 1);
       renderCalendar();
     }
   }, false);
 }
 
-// Llama a esta función dentro de tu DOMContentLoaded en app.js
-document.addEventListener('DOMContentLoaded', () => {
-  // ... resto de tus funciones
-  initSwipeGestures(); 
-});
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
