@@ -8,18 +8,25 @@ body {
 }
 
 .app-header {
+  background: #ffffff !important;
+  border-radius: 12px !important;
+  padding: 10px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 16px;
-  background: #ffffff;
-  border-bottom: 0.5px solid #c6c6c8;
+  margin: 12px 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 #monthLabel {
-  font-size: 20px;
-  font-weight: 600;
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0;
   margin: 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: none !important;
+  display: inline;
 }
 
 .app-header button {
@@ -68,7 +75,7 @@ body {
 .turno-M { background: #e6f4ea; border-color: #34c759; }
 .turno-T { background: #fff3e0; border-color: #ff9500; }
 .turno-N { background: #ede7f6; border-color: #af52de; }
-.turno-D { background: #f2f2f7; border-color: #aeaeb2; }
+.turno-D { background: #f0f0f0; border-color: #8e8e93; }
 .turno-V { background: #e1f0ff; border-color: #007aff; }
 
 /* ===== Resumen Mensual (Sin excedente) ===== */
@@ -103,9 +110,27 @@ body {
 
 /* Botones Modal */
 .turno-buttons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 10px; }
-.turno-buttons button { padding: 8px 0; border-radius: 6px; border: 1px solid #d1d1d6; cursor: pointer; }
-.turno-buttons button[data-turno=""] { background: #e4e4e6; }
-.turno-buttons button.active { box-shadow: 0 0 0 2px #007aff; }
+.turno-buttons button {
+  font-weight: 600;
+  color: #1c1c1e;
+  border-width: 1.5px;
+  border-style: solid;
+  padding: 8px 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.turno-buttons button[data-turno=""] { background: #e4e4e6; border-color: #aeaeb2; }
+.turno-buttons button[data-turno="M"] { background: #e6f4ea; border-color: #34c759; }
+.turno-buttons button[data-turno="T"] { background: #fff3e0; border-color: #ff9500; }
+.turno-buttons button[data-turno="N"] { background: #ede7f6; border-color: #af52de; }
+.turno-buttons button[data-turno="D"] { background: #f0f0f0; border-color: #8e8e93; }
+.turno-buttons button[data-turno="V"] { background: #e1f0ff; border-color: #007aff; }
+
+.turno-buttons button.active {
+  box-shadow: 0 0 0 2px #007aff;
+  transform: scale(1.02);
+}
 
 .editor-buttons { display: flex; gap: 10px; margin-top: 18px; }
 #saveDay { background: #007aff; color: #fff; border: none; flex: 1; padding: 10px; border-radius: 8px; }
@@ -121,70 +146,7 @@ body {
 
 .day-manitou { font-size: 13px; font-weight: 700; color: #b45309; background: #fef3c7; border-radius: 3px; padding: 1px 3px; text-align: center; }
 .manitou-label { display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: 14px; }
-/* ===== Colores por turno (calendario) ===== */
-.turno-M {
-  background: #e6f4ea;
-  border-color: #34c759;
-}
 
-.turno-T {
-  background: #fff3e0;
-  border-color: #ff9500;
-}
-
-.turno-N {
-  background: #ede7f6;
-  border-color: #af52de;
-}
-
-.turno-D {
-  background: #f0f0f0;
-  border-color: #8e8e93;
-}
-
-.turno-V {
-  background: #e1f0ff;
-  border-color: #007aff;
-}
-/* ===== Botones de Turno en el Modal (Estilo idéntico al calendario) ===== */
-.turno-buttons button {
-  font-weight: 600;
-  color: #1c1c1e; /* Letra en negro/oscuro */
-  border-width: 1.5px;
-  border-style: solid;
-}
-
-/* Colores de fondo y borde exactos a los del calendario */
-.turno-buttons button[data-turno=""] { 
-  background: #e4e4e6; 
-  border-color: #aeaeb2; 
-}
-.turno-buttons button[data-turno="M"] { 
-  background: #e6f4ea; 
-  border-color: #34c759; 
-}
-.turno-buttons button[data-turno="T"] { 
-  background: #fff3e0; 
-  border-color: #ff9500; 
-}
-.turno-buttons button[data-turno="N"] { 
-  background: #ede7f6; 
-  border-color: #af52de; 
-}
-.turno-buttons button[data-turno="D"] { 
-  background: #f2f2f7; 
-  border-color: #aeaeb2; 
-}
-.turno-buttons button[data-turno="V"] { 
-  background: #e1f0ff; 
-  border-color: #007aff; 
-}
-
-/* Indicador visual claro para el botón que esté activo */
-.turno-buttons button.active {
-  box-shadow: 0 0 0 2px #007aff;
-  transform: scale(1.02);
-}
 /* Ocultar por completo los espacios de los días vacíos */
 .day.hidden-empty {
   visibility: hidden;
@@ -192,11 +154,13 @@ body {
   background: transparent;
   pointer-events: none;
 }
+
 /* ===== Resaltar el día actual ===== */
 .day.today {
-  border: 2px solid #007aff !important; /* Borde de color más grueso y llamativo (puedes cambiar el color) */
+  border: 2px solid #007aff !important;
   font-weight: bold;
 }
+
 /* Estilo para las nuevas filas de datos */
 .fila-dato {
   display: flex;
@@ -206,14 +170,3 @@ body {
 }
 .fila-dato span { color: #555; }
 .fila-dato strong { color: #000; }
-/* Busca o añade esto en styles.css */
-
-#monthLabel {
-  background: #ffffff !important;
-  border-radius: 12px !important;
-  padding: 8px 16px;
-  text-align: center;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  display: inline-block;
-}
