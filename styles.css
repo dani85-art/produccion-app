@@ -54,6 +54,10 @@ body {
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
   padding: 0 10px 10px 10px;
+  touch-action: pan-y; /* Evita gestos extraños o franjas azules horizontales en móviles */
+  -webkit-user-select: none;
+  user-select: none;
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .day {
