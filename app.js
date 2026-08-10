@@ -178,27 +178,32 @@ function initEditor() {
 
 function calculateAndShowCycle(start, end) {
   getAllDays().then(registros => {
-    let metros = 0, diasTrabajados = 0;
+    let metros = 0;
+    let diasComputables = 0;
+    let diasTrabajados = 0;
+    
     const startDate = new Date(start + 'T00:00:00');
     const endDate = new Date(end + 'T00:00:00');
-    
-    const diffTime = Math.abs(endDate - startDate);
-    const diasTotales = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
     registros.forEach(r => {
       if (r.fecha < start || r.fecha > end) return;
-      if (turnoCuenta(r.turno) && r.metros !== '' && r.metros !== null) {
-        diasTrabajados++;
-        metros += Number(r.metros);
+      
+      if (turnoCuenta(r.turno)) {
+        diasComputables++;
+        
+        if (r.metros !== '' && r.metros !== null) {
+          diasTrabajados++;
+          metros += Number(r.metros);
+        }
       }
     });
 
-    const objetivoTotal = diasTotales * OBJETIVO_DIARIO;
+    const objetivoTotal = diasComputables * OBJETIVO_DIARIO;
     const excedente = metros - objetivoTotal;
 
     const formatOpts = { day: 'numeric', month: 'long' };
     document.getElementById('cyclePeriod').textContent = `${startDate.toLocaleDateString('es-ES', formatOpts)} al ${endDate.toLocaleDateString('es-ES', formatOpts)}`;
-    document.getElementById('cycleTotalDays').textContent = diasTotales;
+    document.getElementById('cycleTotalDays').textContent = diasComputables;
     document.getElementById('cycleTarget').textContent = `${objetivoTotal.toFixed(1)} m`;
     document.getElementById('cycleTotal').textContent = `${metros.toFixed(1)} m`;
     document.getElementById('cycleDays').textContent = diasTrabajados;
