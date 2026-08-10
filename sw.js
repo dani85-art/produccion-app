@@ -1,4 +1,4 @@
-const CACHE_NAME = 'produccion-v2.3-stylos';
+const CACHE_NAME = 'produccion-v2.4-stylos';
 
 const FILES_TO_CACHE = [
   './',
