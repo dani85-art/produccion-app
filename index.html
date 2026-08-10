@@ -28,11 +28,14 @@
     <div class="summary-manitou" id="monthManitou"></div>
   </section>
 
-  <!-- Resultado del Ciclo (Bloque Fijo Moderno) -->
+  <!-- Resultado del Ciclo -->
   <section id="cycleResult" class="hidden">
     <div class="cycle-row"><span>Periodo del ciclo</span><strong id="cyclePeriod">-</strong></div>
     <div class="cycle-row"><span>Días totales del ciclo</span><strong id="cycleTotalDays">0</strong></div>
     <div class="cycle-row"><span>Objetivo total del ciclo</span><strong id="cycleTarget">0 m</strong></div>
+    
+    <div class="cycle-divider"></div>
+    
     <div class="cycle-row"><span>Metros realizados</span><strong id="cycleTotal">0 m</strong></div>
     <div class="cycle-row"><span>Días trabajados</span><strong id="cycleDays">0</strong></div>
     <div class="cycle-row"><span>Excedente</span><strong id="cycleExcess">0 m</strong></div>
@@ -59,7 +62,19 @@
         <button type="button" data-turno="D">D</button>
         <button type="button" data-turno="V">V</button>
       </div>
+      
       <label class="manitou-label"><input type="checkbox" id="editorManitou"> Manitou</label>
+
+      <!-- SECCIÓN DE SONDAS EN HORIZONTAL -->
+      <label>Sonda:</label>
+      <div class="sonda-options-horizontal">
+        <label><input type="checkbox" value="U6-5" class="editor-sonda"> U6-5</label>
+        <label><input type="checkbox" value="U6-6" class="editor-sonda"> U6-6</label>
+        <label><input type="checkbox" value="U6-8" class="editor-sonda"> U6-8</label>
+        <label><input type="checkbox" value="U6-9" class="editor-sonda"> U6-9</label>
+        <label><input type="checkbox" value="U6-12" class="editor-sonda"> U6-12</label>
+      </div>
+
       <label>Metros:</label>
       <input type="number" id="editorMetros" step="0.1" min="0" inputmode="decimal">
       <div class="editor-buttons">
