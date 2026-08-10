@@ -58,6 +58,11 @@ body {
   -webkit-user-select: none;
   user-select: none;
   transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  
+  /* Propiedades para eliminar el destello/franja azul al deslizar */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  outline: none;
 }
 
 .day {
