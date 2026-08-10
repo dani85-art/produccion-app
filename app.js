@@ -263,18 +263,38 @@ function initBackup() {
 
 function initSwipeGestures() {
   let touchStartX = 0;
+  let touchEndX = 0;
   const cal = document.getElementById('calendar');
-  cal.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
+
+  cal.addEventListener('touchstart', e => { 
+    touchStartX = e.changedTouches[0].screenX; 
+  }, { passive: true });
+  
   cal.addEventListener('touchend', e => {
-    let touchEndX = e.changedTouches[0].screenX;
-    if (touchEndX < touchStartX - 50) {
-      currentDate.setMonth(currentDate.getMonth() + 1);
-      renderCalendar();
-    } else if (touchEndX > touchStartX + 50) {
-      currentDate.setMonth(currentDate.getMonth() - 1);
-      renderCalendar();
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchEndX - touchStartX;
+    
+    if (Math.abs(diff) > 50) {
+      cal.style.opacity = '0';
+      cal.style.transform = diff < 0 ? 'translateX(-20px)' : 'translateX(20px)';
+      
+      setTimeout(() => {
+        if (diff < 0) {
+          currentDate.setMonth(currentDate.getMonth() + 1);
+        } else {
+          currentDate.setMonth(currentDate.getMonth() - 1);
+        }
+        renderCalendar();
+        
+        cal.style.transform = diff < 0 ? 'translateX(20px)' : 'translateX(-20px)';
+        requestAnimationFrame(() => {
+          cal.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+          cal.style.opacity = '1';
+          cal.style.transform = 'translateX(0)';
+        });
+      }, 150);
     }
-  }, false);
+  }, { passive: true });
 }
 
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
