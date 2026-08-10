@@ -5,6 +5,7 @@ body {
   padding: 0;
   background: #f2f2f7;
   color: #1c1c1e;
+  -webkit-tap-highlight-color: transparent; /* Evita cualquier destello azul global en la app */
 }
 
 .app-header {
@@ -54,12 +55,10 @@ body {
   grid-template-columns: repeat(7, 1fr);
   gap: 6px;
   padding: 0 10px 10px 10px;
-  touch-action: pan-y; /* Evita gestos extraños o franjas azules horizontales en móviles */
+  touch-action: pan-y;
   -webkit-user-select: none;
   user-select: none;
   transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-  
-  /* Propiedades para eliminar el destello/franja azul al deslizar */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   outline: none;
@@ -74,6 +73,9 @@ body {
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  -webkit-tap-highlight-color: transparent; /* Evita el destello azul al tocar las celdas del calendario */
+  -webkit-touch-callout: none;
+  user-select: none;
 }
 
 .day-number { font-weight: 600; font-size: 15px; }
@@ -127,6 +129,7 @@ body {
   padding: 8px 0;
   border-radius: 6px;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .turno-buttons button[data-turno=""] { background: #e4e4e6; border-color: #aeaeb2; }
@@ -149,9 +152,10 @@ body {
 #openCycle {
   display: block; width: calc(100% - 32px); margin: 12px auto; padding: 12px;
   border-radius: 12px; border: none; background: #007aff; color: #fff; font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
 }
 #backupButtons { display: flex; gap: 10px; margin: 0 16px 20px 16px; }
-#backupButtons button { flex: 1; padding: 10px; border-radius: 12px; border: none; background: #e5e5ea; }
+#backupButtons button { flex: 1; padding: 10px; border-radius: 12px; border: none; background: #e5e5ea; -webkit-tap-highlight-color: transparent; }
 
 .day-manitou { font-size: 13px; font-weight: 700; color: #b45309; background: #fef3c7; border-radius: 3px; padding: 1px 3px; text-align: center; }
 .manitou-label { display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: 14px; }
