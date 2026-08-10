@@ -5,7 +5,7 @@ body {
   padding: 0;
   background: #f2f2f7;
   color: #1c1c1e;
-  -webkit-tap-highlight-color: transparent; /* Evita cualquier destello azul global en la app */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .app-header {
@@ -58,7 +58,6 @@ body {
   touch-action: pan-y;
   -webkit-user-select: none;
   user-select: none;
-  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   outline: none;
@@ -73,7 +72,7 @@ body {
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  -webkit-tap-highlight-color: transparent; /* Evita el destello azul al tocar las celdas del calendario */
+  -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   user-select: none;
 }
@@ -160,7 +159,6 @@ body {
 .day-manitou { font-size: 13px; font-weight: 700; color: #b45309; background: #fef3c7; border-radius: 3px; padding: 1px 3px; text-align: center; }
 .manitou-label { display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: 14px; }
 
-/* Ocultar por completo los espacios de los días vacíos */
 .day.hidden-empty {
   visibility: hidden;
   border: none;
@@ -168,13 +166,11 @@ body {
   pointer-events: none;
 }
 
-/* ===== Resaltar el día actual ===== */
 .day.today {
   border: 2px solid #007aff !important;
   font-weight: bold;
 }
 
-/* Estilo para las nuevas filas de datos */
 .fila-dato {
   display: flex;
   justify-content: space-between;
