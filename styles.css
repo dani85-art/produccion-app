@@ -88,7 +88,7 @@ body {
 .turno-D { background: #f0f0f0; border-color: #8e8e93; }
 .turno-V { background: #e1f0ff; border-color: #007aff; }
 
-/* ===== Resumen Mensual (Sin excedente) ===== */
+/* ===== Resumen Mensual ===== */
 #monthSummary {
   margin: 10px 16px;
   padding: 12px;
@@ -106,6 +106,10 @@ body {
   border-radius: 12px;
 }
 .cycle-row { display: flex; justify-content: space-between; margin: 6px 0; font-size: 14px; }
+.cycle-divider {
+  border-top: 1px solid #e5e5ea;
+  margin: 10px 0;
+}
 .excedente-pos { color: #2e7d32 !important; font-weight: bold; }
 .excedente-neg { color: #c62828 !important; font-weight: bold; }
 .excedente-neu { color: #000 !important; font-weight: bold; }
@@ -116,7 +120,7 @@ body {
   display: flex; align-items: center; justify-content: center; z-index: 10;
 }
 .editor.hidden { display: none; }
-.editor > div { background: #fff; padding: 20px; border-radius: 14px; width: 280px; }
+.editor > div { background: #fff; padding: 20px; border-radius: 14px; width: 310px; max-height: 90vh; overflow-y: auto; }
 
 /* Botones Modal */
 .turno-buttons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 10px; }
@@ -147,16 +151,33 @@ body {
 #saveDay { background: #007aff; color: #fff; border: none; flex: 1; padding: 10px; border-radius: 8px; }
 #cancelDay { background: #e5e5ea; border: none; flex: 1; padding: 10px; border-radius: 8px; }
 
-/* ===== Elementos Globales ===== */
-#openCycle {
-  display: block; width: calc(100% - 32px); margin: 12px auto; padding: 12px;
-  border-radius: 12px; border: none; background: #007aff; color: #fff; font-weight: 600;
-  -webkit-tap-highlight-color: transparent;
+/* ===== Sondas en Horizontal en el Modal ===== */
+.sonda-options-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 6px 0 12px 0;
+  font-size: 13px;
 }
-#backupButtons { display: flex; gap: 10px; margin: 0 16px 20px 16px; }
-#backupButtons button { flex: 1; padding: 10px; border-radius: 12px; border: none; background: #e5e5ea; -webkit-tap-highlight-color: transparent; }
+.sonda-options-horizontal label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: #f2f2f7;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #e5e5ea;
+}
 
-.day-manitou { font-size: 13px; font-weight: 700; color: #b45309; background: #fef3c7; border-radius: 3px; padding: 1px 3px; text-align: center; }
+/* Etiquetas dentro de la celda del calendario (Mejor contraste) */
+.day-manitou { 
+  font-size: 11px; font-weight: 700; color: #92400e; background: #fef3c7; border: 0.5px solid #fcd34d; border-radius: 3px; padding: 1px 3px; text-align: center; margin-top: 2px; 
+}
+.day-sonda { 
+  font-size: 11px; font-weight: 700; color: #374151; background: #f3f4f6; border: 0.5px solid #d1d5db; border-radius: 3px; padding: 1px 3px; text-align: center; margin-top: 2px; 
+}
+
 .manitou-label { display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: 14px; }
 
 .day.hidden-empty {
@@ -170,12 +191,39 @@ body {
   border: 2px solid #007aff !important;
   font-weight: bold;
 }
-
-.fila-dato {
-  display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-bottom: 1px solid #eee;
+/* ===== Contenedor y Botones Inferiores (Ciclo y Backup) ===== */
+#openCycle {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 16px auto;
+  padding: 14px;
+  background: #007aff;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+  text-align: center;
 }
-.fila-dato span { color: #555; }
-.fila-dato strong { color: #000; }
+
+#backupButtons {
+  display: flex;
+  gap: 10px;
+  margin: 0 16px 24px 16px;
+}
+
+#backupButtons button {
+  flex: 1;
+  padding: 10px;
+  background: #ffffff;
+  color: #1c1c1e;
+  border: 0.5px solid #c6c6c8;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
