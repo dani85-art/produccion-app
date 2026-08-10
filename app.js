@@ -74,7 +74,14 @@ function renderCalendar() {
         if (r.metros !== '' && r.metros !== null && r.metros !== undefined) {
           cell.innerHTML += `<div class="day-metros">${r.metros}</div>`;
         }
-        if (r.manitou) cell.innerHTML += `<div class="day-manitou">MAN</div>`;
+        if (r.manitou) {
+          cell.innerHTML += `<div class="day-manitou">MAN</div>`;
+        }
+        if (r.sondas && r.sondas.length > 0) {
+          r.sondas.forEach(sonda => {
+            cell.innerHTML += `<div class="day-sonda">${sonda}</div>`;
+          });
+        }
       }
       
       const today = new Date();
@@ -122,6 +129,7 @@ function initEditor() {
   const editorDate = document.getElementById('editorDate');
   const editorMetros = document.getElementById('editorMetros');
   const editorManitou = document.getElementById('editorManitou');
+  const sondaCheckboxes = editor.querySelectorAll('.editor-sonda');
   const turnoButtons = editor.querySelectorAll('.turno-buttons button');
 
   function updateActiveButton(turno) {
@@ -143,11 +151,16 @@ function initEditor() {
     const rawMetros = editorMetros.value.trim().replace(',', '.');
     const metros = rawMetros === '' ? null : Number(rawMetros);
 
+    const selectedSondas = Array.from(sondaCheckboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value);
+
     saveDay({ 
       fecha: editingFecha, 
       turno: selectedTurno, 
       metros: isNaN(metros) ? null : metros, 
-      manitou: editorManitou.checked 
+      manitou: editorManitou.checked,
+      sondas: selectedSondas
     }).then(() => {
       editor.classList.add('hidden');
       renderCalendar();
@@ -165,6 +178,7 @@ function initEditor() {
     selectedTurno = '';
     editorMetros.value = '';
     editorManitou.checked = false;
+    sondaCheckboxes.forEach(cb => cb.checked = false);
 
     getAllDays().then(registros => {
       const r = registros.find(x => x.fecha === fecha);
@@ -172,6 +186,12 @@ function initEditor() {
         selectedTurno = r.turno ?? '';
         editorMetros.value = (r.metros !== null && r.metros !== undefined) ? r.metros : '';
         editorManitou.checked = r.manitou ?? false;
+        
+        if (r.sondas && Array.isArray(r.sondas)) {
+          sondaCheckboxes.forEach(cb => {
+            cb.checked = r.sondas.includes(cb.value);
+          });
+        }
       }
       updateActiveButton(selectedTurno);
       editor.classList.remove('hidden');
@@ -229,7 +249,6 @@ function initCycleSelector() {
     
     if (!start || !end) return alert('Selecciona ambas fechas');
     
-    // VALIDACIÓN NUEVA: Comprobamos que el inicio no sea posterior al fin
     if (start > end) {
       return alert('La fecha de inicio no puede ser posterior a la fecha de fin.');
     }
