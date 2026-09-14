@@ -68,11 +68,14 @@ body {
   border: 0.5px solid #c6c6c8;
   border-radius: 8px;
   min-height: 75px;
+  height: auto;
   padding: 5px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: visible;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   user-select: none;
@@ -240,13 +243,15 @@ body {
   border: 1px solid #e5e5ea;
 }
 
-/* Punto 3: Etiquetas de maquina / sondas más pequeñas y compactas en una sola línea */
+/* Insignias apiladas verticalmente en renglones diferentes */
 .day-info-row {
   display: flex;
-  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: center;
   gap: 2px;
   margin-top: 2px;
-  overflow: hidden;
+  width: 100%;
+  overflow: visible;
 }
 
 .day-manitou { 
