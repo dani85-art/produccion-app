@@ -68,18 +68,21 @@ body {
   border: 0.5px solid #c6c6c8;
   border-radius: 8px;
   min-height: 75px;
-  padding: 6px;
+  padding: 5px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   user-select: none;
 }
 
-.day-number { font-weight: 600; font-size: 15px; }
-.day-turno { font-size: 15px; font-weight: 700; }
-.day-metros { font-size: 13px; font-weight: 600; color: #007aff; }
+.day-number { font-weight: 600; font-size: 14px; }
+.day-turno { font-size: 14px; font-weight: 700; }
+
+/* Punto 4: Metros un poco más grandes */
+.day-metros { font-size: 14px; font-weight: 700; color: #007aff; }
 
 /* Colores Calendario */
 .turno-M { background: #e6f4ea; border-color: #34c759; }
@@ -97,6 +100,7 @@ body {
   text-align: center;
 }
 .summary-value { font-size: 26px; font-weight: 700; }
+.summary-manitou, .summary-extra { font-size: 13px; color: #636366; margin-top: 4px; }
 
 /* ===== Bloque Ciclo Fijo ===== */
 #cycleResult {
@@ -113,6 +117,58 @@ body {
 .excedente-pos { color: #2e7d32 !important; font-weight: bold; }
 .excedente-neg { color: #c62828 !important; font-weight: bold; }
 .excedente-neu { color: #000 !important; font-weight: bold; }
+
+/* ===== Botones Principales Inferiores ===== */
+#openCycle {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 16px auto 10px auto;
+  padding: 14px;
+  background: #007aff;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+  text-align: center;
+}
+
+.secondary-action-btn {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 0 auto 16px auto;
+  padding: 12px;
+  background: #ffffff;
+  color: #007aff;
+  border: 1px solid #007aff;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+#backupButtons {
+  display: flex;
+  gap: 10px;
+  margin: 0 16px 24px 16px;
+}
+
+#backupButtons button {
+  flex: 1;
+  padding: 10px;
+  background: #ffffff;
+  color: #1c1c1e;
+  border: 0.5px solid #c6c6c8;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
 
 /* ===== Modal Editor ===== */
 .editor {
@@ -148,14 +204,28 @@ body {
 }
 
 .editor-buttons { display: flex; gap: 10px; margin-top: 18px; }
-#saveDay { background: #007aff; color: #fff; border: none; flex: 1; padding: 10px; border-radius: 8px; }
-#cancelDay { background: #e5e5ea; border: none; flex: 1; padding: 10px; border-radius: 8px; }
+#saveDay, #applyCycle, #generateReportBtn { background: #007aff; color: #fff; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+#cancelDay, #cancelCycle, #cancelReport { background: #e5e5ea; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-/* ===== Sondas en Horizontal en el Modal ===== */
+/* ===== Opciones y Sondas en el Modal ===== */
+.editor-flags {
+  display: flex;
+  gap: 15px;
+  margin: 10px 0;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
 .sonda-options-horizontal {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   margin: 6px 0 12px 0;
   font-size: 13px;
 }
@@ -170,15 +240,24 @@ body {
   border: 1px solid #e5e5ea;
 }
 
-/* Etiquetas dentro de la celda del calendario (Mejor contraste) */
-.day-manitou { 
-  font-size: 11px; font-weight: 700; color: #92400e; background: #fef3c7; border: 0.5px solid #fcd34d; border-radius: 3px; padding: 1px 3px; text-align: center; margin-top: 2px; 
-}
-.day-sonda { 
-  font-size: 11px; font-weight: 700; color: #374151; background: #f3f4f6; border: 0.5px solid #d1d5db; border-radius: 3px; padding: 1px 3px; text-align: center; margin-top: 2px; 
+/* Punto 3: Etiquetas de maquina / sondas más pequeñas y compactas en una sola línea */
+.day-info-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 2px;
+  margin-top: 2px;
+  overflow: hidden;
 }
 
-.manitou-label { display: flex; align-items: center; gap: 8px; margin: 12px 0; font-size: 14px; }
+.day-manitou { 
+  font-size: 9px; font-weight: 700; color: #92400e; background: #fef3c7; border: 0.5px solid #fcd34d; border-radius: 3px; padding: 0px 2px; white-space: nowrap;
+}
+.day-extra { 
+  font-size: 9px; font-weight: 700; color: #065f46; background: #d1fae5; border: 0.5px solid #6ee7b7; border-radius: 3px; padding: 0px 2px; white-space: nowrap;
+}
+.day-sonda { 
+  font-size: 9px; font-weight: 700; color: #374151; background: #f3f4f6; border: 0.5px solid #d1d5db; border-radius: 3px; padding: 0px 2px; white-space: nowrap;
+}
 
 .day.hidden-empty {
   visibility: hidden;
@@ -190,40 +269,4 @@ body {
 .day.today {
   border: 2px solid #007aff !important;
   font-weight: bold;
-}
-/* ===== Contenedor y Botones Inferiores (Ciclo y Backup) ===== */
-#openCycle {
-  display: block;
-  width: calc(100% - 32px);
-  margin: 16px auto;
-  padding: 14px;
-  background: #007aff;
-  color: #ffffff;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
-  text-align: center;
-}
-
-#backupButtons {
-  display: flex;
-  gap: 10px;
-  margin: 0 16px 24px 16px;
-}
-
-#backupButtons button {
-  flex: 1;
-  padding: 10px;
-  background: #ffffff;
-  color: #1c1c1e;
-  border: 0.5px solid #c6c6c8;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  text-align: center;
 }
