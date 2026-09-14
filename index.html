@@ -26,6 +26,7 @@
   <section id="monthSummary">
     <div class="summary-value" id="monthTotal">0 m</div>
     <div class="summary-manitou" id="monthManitou"></div>
+    <div class="summary-extra" id="monthExtra"></div>
   </section>
 
   <!-- Resultado del Ciclo -->
@@ -42,6 +43,7 @@
   </section>
 
   <button id="openCycle">Seleccionar ciclo</button>
+  <button id="openReportModal" class="secondary-action-btn">📄 Generar informe detallado</button>
 
   <div id="backupButtons">
     <button id="exportBackup">📥 Exportar</button>
@@ -63,7 +65,10 @@
         <button type="button" data-turno="V">V</button>
       </div>
       
-      <label class="manitou-label"><input type="checkbox" id="editorManitou"> Manitou</label>
+      <div class="editor-flags">
+        <label class="checkbox-label"><input type="checkbox" id="editorManitou"> Manitou</label>
+        <label class="checkbox-label"><input type="checkbox" id="editorExtra"> Día Extra</label>
+      </div>
 
       <!-- SECCIÓN DE SONDAS EN HORIZONTAL -->
       <label>Sonda:</label>
@@ -93,6 +98,19 @@
       <div class="editor-buttons">
         <button id="applyCycle">Aplicar</button>
         <button id="cancelCycle">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SELECTOR DE INFORME DETALLADO (Punto 2) -->
+  <div id="reportSelector" class="editor hidden">
+    <div>
+      <h3>Informe por fechas</h3>
+      <label>Desde:<input type="date" id="reportStart"></label>
+      <label>Hasta:<input type="date" id="reportEnd"></label>
+      <div class="editor-buttons">
+        <button id="generateReportBtn">Generar PDF</button>
+        <button id="cancelReport">Cancelar</button>
       </div>
     </div>
   </div>
