@@ -138,21 +138,6 @@ body {
   text-align: center;
 }
 
-.secondary-action-btn {
-  display: block;
-  width: calc(100% - 32px);
-  margin: 0 auto 16px auto;
-  padding: 12px;
-  background: #ffffff;
-  color: #007aff;
-  border: 1px solid #007aff;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-}
-
 #backupButtons {
   display: flex;
   gap: 10px;
@@ -207,8 +192,8 @@ body {
 }
 
 .editor-buttons { display: flex; gap: 10px; margin-top: 18px; }
-#saveDay, #applyCycle, #generateReportBtn { background: #007aff; color: #fff; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-#cancelDay, #cancelCycle, #cancelReport { background: #e5e5ea; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+#saveDay, #applyCycle { background: #007aff; color: #fff; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+#cancelDay, #cancelCycle { background: #e5e5ea; border: none; flex: 1; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
 /* ===== Opciones y Sondas en el Modal ===== */
 .editor-flags {
