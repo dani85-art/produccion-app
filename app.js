@@ -1,15 +1,28 @@
 const OBJETIVO_DIARIO = 11.2;
 
-const TURNOS = {
-  M: { cuenta: true },
-  T: { cuenta: true },
-  N: { cuenta: true },
-  D: { cuenta: false },
-  V: { cuenta: false }
-};
+function diaCuentaParaCiclo(r) {
+  const trasladosCuentan = localStorage.getItem('settingTrasladoCuenta') === 'true';
+  const diasExtraNoCuentan = localStorage.getItem('settingDiasExtraNoCuenta') === 'true';
 
-function turnoCuenta(turno) {
-  return TURNOS[turno]?.cuenta === true;
+  // Si el ajuste de exclusión está activo y el día tiene marca extra (EXT), no cuenta para el ciclo bajo ningún concepto
+  const esDiaExtra = r.extra === true || r.etiquetas?.includes('EXT');
+  if (diasExtraNoCuentan && esDiaExtra) {
+    return false;
+  }
+
+  if (r.traslado) {
+    return trasladosCuentan;
+  }
+
+  const TURNOS = {
+    M: { cuenta: true },
+    T: { cuenta: true },
+    N: { cuenta: true },
+    D: { cuenta: false },
+    V: { cuenta: false }
+  };
+
+  return TURNOS[r.turno]?.cuenta === true;
 }
 
 function formatDate(dateStr) {
@@ -27,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMonthNavigation();
   initEditor();
   initCycleSelector();
+  initSettingsModal();
   initBackup();
   renderCalendar();
   loadCycleDates();
@@ -58,17 +72,15 @@ function renderCalendar() {
 
   const firstDay = new Date(year, month, 1);
   let startWeekDay = firstDay.getDay();
-  startWeekDay = startWeekDay === 0 ? 6 : startWeekDay - 1; // Ajuste para Lunes como primer día
+  startWeekDay = startWeekDay === 0 ? 6 : startWeekDay - 1; 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // 1. Celdas vacías de relleno al inicio del mes
   for (let i = 0; i < startWeekDay; i++) {
     const empty = document.createElement('div');
     empty.className = 'day empty hidden-empty';
     cal.appendChild(empty);
   }
 
-  // 2. Pintar inmediatamente los días del mes (del 1 al 31) para que nunca se queden en blanco
   const dayCells = {};
   for (let day = 1; day <= daysInMonth; day++) {
     const cell = document.createElement('div');
@@ -87,14 +99,17 @@ function renderCalendar() {
     dayCells[fecha] = cell;
   }
   
-  // 3. Cargar los datos guardados y rellenar los turnos y métricas en sus celdas correspondientes
+  const activarSondas = localStorage.getItem('settingActivarSondas') === 'true';
+
   getAllDays().then(registros => {
     if (registros && Array.isArray(registros)) {
       registros.forEach(r => {
         const cell = dayCells[r.fecha];
-        if (cell && r.turno) {
-          cell.classList.add(`turno-${r.turno}`);
-          cell.innerHTML += `<div class="day-turno">${r.turno}</div>`;
+        if (cell) {
+          if (r.turno) {
+            cell.classList.add(`turno-${r.turno}`);
+            cell.innerHTML += `<div class="day-turno">${r.turno}</div>`;
+          }
           if (r.metros !== '' && r.metros !== null && r.metros !== undefined) {
             cell.innerHTML += `<div class="day-metros">${r.metros}</div>`;
           }
@@ -102,11 +117,14 @@ function renderCalendar() {
           let badgesHtml = '<div class="day-info-row">';
           if (r.manitou) badgesHtml += `<span class="day-manitou">MAN</span>`;
           if (r.extra) badgesHtml += `<span class="day-extra">EXT</span>`;
-          if (r.sondas && r.sondas.length > 0) {
+          if (r.traslado) badgesHtml += `<span class="day-traslado">Trasl</span>`;
+          
+          if (activarSondas && r.sondas && Array.isArray(r.sondas)) {
             r.sondas.forEach(sonda => {
               badgesHtml += `<span class="day-sonda">${sonda}</span>`;
             });
           }
+          
           badgesHtml += '</div>';
           cell.innerHTML += badgesHtml;
         }
@@ -132,7 +150,15 @@ function calcularResumenMensual(registros, year, month) {
     if (!isSameMonth(r.fecha, year, month)) return;
     if (r.manitou) diasManitou++;
     if (r.extra) diasExtra++;
-    if (turnoCuenta(r.turno) && r.metros !== '' && r.metros !== null && r.metros !== undefined) {
+    
+    // El resumen mensual también puede excluir los extras si el ajuste está activo
+    const diasExtraNoCuentan = localStorage.getItem('settingDiasExtraNoCuenta') === 'true';
+    const esDiaExtra = r.extra === true || r.etiquetas?.includes('EXT');
+    if (diasExtraNoCuentan && esDiaExtra) return; // Se salta este día para el cómputo mensual de metros
+    
+    const cuentaMensual = r.traslado ? (localStorage.getItem('settingTrasladoCuenta') === 'true') : (r.turno === 'M' || r.turno === 'T' || r.turno === 'N');
+    
+    if (cuentaMensual && r.metros !== '' && r.metros !== null && r.metros !== undefined) {
       metros += Number(r.metros);
     }
   });
@@ -172,6 +198,8 @@ function initEditor() {
   const editorMetros = document.getElementById('editorMetros');
   const editorManitou = document.getElementById('editorManitou');
   const editorExtra = document.getElementById('editorExtra');
+  const editorTraslado = document.getElementById('editorTraslado');
+  const sondasContainer = document.getElementById('editorSondasContainer');
   const sondaCheckboxes = editor.querySelectorAll('.editor-sonda');
   const turnoButtons = editor.querySelectorAll('.turno-buttons button');
 
@@ -194,9 +222,10 @@ function initEditor() {
     const rawMetros = editorMetros.value.trim().replace(',', '.');
     const metros = rawMetros === '' ? null : Number(rawMetros);
 
-    const selectedSondas = Array.from(sondaCheckboxes)
+    const activarSondas = localStorage.getItem('settingActivarSondas') === 'true';
+    const selectedDaySondas = activarSondas ? Array.from(sondaCheckboxes)
       .filter(cb => cb.checked)
-      .map(cb => cb.value);
+      .map(cb => cb.value) : [];
 
     saveDay({ 
       fecha: editingFecha, 
@@ -204,7 +233,8 @@ function initEditor() {
       metros: isNaN(metros) ? null : metros, 
       manitou: editorManitou.checked,
       extra: editorExtra.checked,
-      sondas: selectedSondas
+      traslado: editorTraslado.checked,
+      sondas: selectedDaySondas
     }).then(() => {
       editor.classList.add('hidden');
       renderCalendar();
@@ -225,7 +255,13 @@ function initEditor() {
     if (editorMetros) editorMetros.value = '';
     if (editorManitou) editorManitou.checked = false;
     if (editorExtra) editorExtra.checked = false;
+    if (editorTraslado) editorTraslado.checked = false;
     sondaCheckboxes.forEach(cb => cb.checked = false);
+
+    const activarSondas = localStorage.getItem('settingActivarSondas') === 'true';
+    if (sondasContainer) {
+      sondasContainer.style.display = activarSondas ? 'block' : 'none';
+    }
 
     getAllDays().then(registros => {
       const r = registros.find(x => x.fecha === fecha);
@@ -234,8 +270,9 @@ function initEditor() {
         if (editorMetros) editorMetros.value = (r.metros !== null && r.metros !== undefined) ? r.metros : '';
         if (editorManitou) editorManitou.checked = r.manitou ?? false;
         if (editorExtra) editorExtra.checked = r.extra ?? false;
+        if (editorTraslado) editorTraslado.checked = r.traslado ?? false;
         
-        if (r.sondas && Array.isArray(r.sondas)) {
+        if (activarSondas && r.sondas && Array.isArray(r.sondas)) {
           sondaCheckboxes.forEach(cb => {
             cb.checked = r.sondas.includes(cb.value);
           });
@@ -253,13 +290,19 @@ function calculateAndShowCycle(start, end) {
     let diasComputables = 0;
     let diasTrabajados = 0;
     
-    const startDate = new Date(start + 'T00:00:00');
-    const endDate = new Date(end + 'T00:00:00');
+    const diasExtraNoCuentan = localStorage.getItem('settingDiasExtraNoCuenta') === 'true';
 
     registros.forEach(r => {
       if (r.fecha < start || r.fecha > end) return;
       
-      if (turnoCuenta(r.turno)) {
+      const esDiaExtra = r.extra === true || r.etiquetas?.includes('EXT');
+
+      // Si el día es extra y el ajuste pide excluirlos, se ignoran por completo para el ciclo y sus metros
+      if (diasExtraNoCuentan && esDiaExtra) {
+        return;
+      }
+      
+      if (diaCuentaParaCiclo(r)) {
         diasComputables++;
         
         if (r.metros !== '' && r.metros !== null && r.metros !== undefined) {
@@ -272,10 +315,18 @@ function calculateAndShowCycle(start, end) {
     const objetivoTotal = diasComputables * OBJETIVO_DIARIO;
     const excedente = metros - objetivoTotal;
 
-    const formatOpts = { day: 'numeric', month: 'long' };
+    const formatOpts = { day: 'numeric', month: 'short' };
+    const formatearFechaCapitalizada = (fechaStr) => {
+      const fechaObj = new Date(fechaStr + 'T00:00:00');
+      let texto = fechaObj.toLocaleDateString('es-ES', formatOpts);
+      return texto.replace(/^([0-9]+\s+)([a-z])/, (_, prefix, char) => prefix + char.toUpperCase());
+    };
+
     const cyclePeriodEl = document.getElementById('cyclePeriod');
-    if (cyclePeriodEl) cyclePeriodEl.textContent = `${startDate.toLocaleDateString('es-ES', formatOpts)} al ${endDate.toLocaleDateString('es-ES', formatOpts)}`;
-    
+    if (cyclePeriodEl) {
+      cyclePeriodEl.textContent = `${formatearFechaCapitalizada(start)} al ${formatearFechaCapitalizada(end)}`;
+    }
+  
     const cycleTotalDaysEl = document.getElementById('cycleTotalDays');
     if (cycleTotalDaysEl) cycleTotalDaysEl.textContent = diasComputables;
     
@@ -327,6 +378,49 @@ function loadCycleDates() {
     if (endInput) endInput.value = end;
     calculateAndShowCycle(start, end);
   }
+}
+
+function initSettingsModal() {
+  const modal = document.getElementById('settingsModal');
+  const trasladoCheckbox = document.getElementById('settingTrasladoCuenta');
+  const activarSondasCheckbox = document.getElementById('settingActivarSondas');
+  const diasExtraNoCuentaCheckbox = document.getElementById('settingDiasExtraNoCuenta');
+
+  document.getElementById('openSettings')?.addEventListener('click', () => {
+    if (trasladoCheckbox) {
+      trasladoCheckbox.checked = localStorage.getItem('settingTrasladoCuenta') === 'true';
+    }
+    if (activarSondasCheckbox) {
+      activarSondasCheckbox.checked = localStorage.getItem('settingActivarSondas') === 'true';
+    }
+    if (diasExtraNoCuentaCheckbox) {
+      diasExtraNoCuentaCheckbox.checked = localStorage.getItem('settingDiasExtraNoCuenta') === 'true';
+    }
+    modal?.classList.remove('hidden');
+  });
+
+  document.getElementById('cancelSettings')?.addEventListener('click', () => {
+    modal?.classList.add('hidden');
+  });
+
+  document.getElementById('saveSettings')?.addEventListener('click', () => {
+    if (trasladoCheckbox) {
+      localStorage.setItem('settingTrasladoCuenta', trasladoCheckbox.checked ? 'true' : 'false');
+    }
+    if (activarSondasCheckbox) {
+      localStorage.setItem('settingActivarSondas', activarSondasCheckbox.checked ? 'true' : 'false');
+    }
+    if (diasExtraNoCuentaCheckbox) {
+      localStorage.setItem('settingDiasExtraNoCuenta', diasExtraNoCuentaCheckbox.checked ? 'true' : 'false');
+    }
+
+    modal?.classList.add('hidden');
+    
+    renderCalendar();
+    const start = document.getElementById('cycleStart')?.value;
+    const end = document.getElementById('cycleEnd')?.value;
+    if (start && end) calculateAndShowCycle(start, end);
+  });
 }
 
 function initBackup() {
