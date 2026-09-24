@@ -2,18 +2,18 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Producción</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1C1C1E">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Metros</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
   <header class="app-header">
-    <button id="prevMonth">◀</button>
-    <h1 id="monthLabel">MES AÑO</h1>
-    <button id="nextMonth">▶</button>
+    <button id="openSettings" title="Ajustes">⋮</button>
+    <div class="month-nav-container">
+      <button id="prevMonth">◀</button>
+      <h1 id="monthLabel">MES AÑO</h1>
+      <button id="nextMonth">▶</button>
+    </div>
   </header>
 
   <section id="weekdays">
@@ -22,65 +22,65 @@
 
   <section id="calendar"></section>
 
-  <!-- Resumen Mensual -->
   <section id="monthSummary">
-    <div class="summary-value" id="monthTotal">0 m</div>
-    <div class="summary-manitou" id="monthManitou"></div>
-    <div class="summary-extra" id="monthExtra"></div>
+    <div class="summary-value" id="monthTotal">0.0 m</div>
+    <div id="monthManitou" style="display:none;"></div>
+    <div id="monthExtra" style="display:none;"></div>
   </section>
 
-  <!-- Resultado del Ciclo -->
-  <section id="cycleResult" class="hidden">
-    <div class="cycle-row"><span>Periodo del ciclo</span><strong id="cyclePeriod">-</strong></div>
-    <div class="cycle-row"><span>Días totales del ciclo</span><strong id="cycleTotalDays">0</strong></div>
-    <div class="cycle-row"><span>Objetivo total del ciclo</span><strong id="cycleTarget">0 m</strong></div>
-    
+  <section id="cycleResult">
+    <div class="cycle-row"><span>Periodo del ciclo:</span> <strong id="cyclePeriod">-</strong></div>
+    <div class="cycle-row"><span>Días totales del ciclo:</span> <strong id="cycleTotalDays">0</strong></div>
+    <div class="cycle-row"><span>Objetivo total del ciclo:</span> <strong id="cycleTarget">0.0 m</strong></div>
     <div class="cycle-divider"></div>
-    
-    <div class="cycle-row"><span>Metros realizados</span><strong id="cycleTotal">0 m</strong></div>
-    <div class="cycle-row"><span>Días trabajados</span><strong id="cycleDays">0</strong></div>
-    <div class="cycle-row"><span>Excedente</span><strong id="cycleExcess">0 m</strong></div>
+    <div class="cycle-row"><span>Metros realizados:</span> <strong id="cycleTotal">0.0 m</strong></div>
+    <div class="cycle-row"><span>Días trabajados:</span> <strong id="cycleDays">0</strong></div>
+    <div class="cycle-row"><span>Excedente:</span> <strong id="cycleExcess">0.0 m</strong></div>
+    <button id="openCycle" style="margin-top: 12px;">Seleccionar ciclo</button>
   </section>
-
-  <button id="openCycle">Seleccionar ciclo</button>
 
   <div id="backupButtons">
     <button id="exportBackup">📥 Exportar</button>
     <button id="importBackup">📤 Importar</button>
-    <input type="file" id="importFile" accept=".json" style="display:none">
+    <input type="file" id="importFile" style="display:none" accept=".json">
   </div>
 
   <!-- EDITOR DE DÍA -->
   <div id="dayEditor" class="editor hidden">
-    <div>
-      <h3 id="editorDate"></h3>
-      <label>Turno:</label>
-      <div id="turnoButtons" class="turno-buttons">
-        <button type="button" data-turno="">—</button>
-        <button type="button" data-turno="M">M</button>
-        <button type="button" data-turno="T">T</button>
-        <button type="button" data-turno="N">N</button>
-        <button type="button" data-turno="D">D</button>
-        <button type="button" data-turno="V">V</button>
-      </div>
+    <div class="editor-content">
+      <h3 id="editorDate" style="margin-top:0; font-size:15px; color:#3a3a3c; text-align:center; margin-bottom:12px;">Editar Día</h3>
       
-      <div class="editor-flags">
+      <label style="font-size: 13px; font-weight:600; display:block; margin-bottom:6px;">Turno:</label>
+      <div class="turno-buttons">
+        <button data-turno="">—</button>
+        <button data-turno="M">M</button>
+        <button data-turno="T">T</button>
+        <button data-turno="N">N</button>
+        <button data-turno="D">D</button>
+        <button data-turno="V">V</button>
+      </div>
+
+      <div class="editor-flags" style="margin-top: 12px;">
         <label class="checkbox-label"><input type="checkbox" id="editorManitou"> Manitou</label>
         <label class="checkbox-label"><input type="checkbox" id="editorExtra"> Día Extra</label>
+        <label class="checkbox-label"><input type="checkbox" id="editorTraslado"> Traslado</label>
       </div>
 
-      <!-- SECCIÓN DE SONDAS EN HORIZONTAL -->
-      <label>Sonda:</label>
-      <div class="sonda-options-horizontal">
-        <label><input type="checkbox" value="U6-5" class="editor-sonda"> U6-5</label>
-        <label><input type="checkbox" value="U6-6" class="editor-sonda"> U6-6</label>
-        <label><input type="checkbox" value="U6-8" class="editor-sonda"> U6-8</label>
-        <label><input type="checkbox" value="U6-9" class="editor-sonda"> U6-9</label>
-        <label><input type="checkbox" value="U6-12" class="editor-sonda"> U6-12</label>
+      <!-- Sondas (Se muestran aquí solo si están activadas en Ajustes) -->
+      <div id="editorSondasContainer" style="display:none; margin-top:10px;">
+        <label style="font-size: 13px; font-weight:600; display:block; margin-bottom:4px;">Sonda:</label>
+        <div class="sonda-options-horizontal" style="display:flex; flex-wrap:wrap; gap:10px;">
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;"><input type="checkbox" class="editor-sonda" value="U6-5" style="width: 15px; height: 15px;"> U6-5</label>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;"><input type="checkbox" class="editor-sonda" value="U6-6" style="width: 15px; height: 15px;"> U6-6</label>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;"><input type="checkbox" class="editor-sonda" value="U6-8" style="width: 15px; height: 15px;"> U6-8</label>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;"><input type="checkbox" class="editor-sonda" value="U6-9" style="width: 15px; height: 15px;"> U6-9</label>
+          <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;"><input type="checkbox" class="editor-sonda" value="U6-12" style="width: 15px; height: 15px;"> U6-12</label>
+        </div>
       </div>
 
-      <label>Metros:</label>
-      <input type="number" id="editorMetros" step="0.1" min="0" inputmode="decimal">
+      <label style="font-size: 13px; font-weight:600; display:block; margin-top:10px;">Metros:</label>
+      <input type="number" id="editorMetros" step="0.1" style="width:100%; padding:8px; box-sizing:border-box; border:1px solid #c6c6c8; border-radius:6px; margin-bottom:14px; font-size:16px;">
+
       <div class="editor-buttons">
         <button id="saveDay">Guardar</button>
         <button id="cancelDay">Cancelar</button>
@@ -90,13 +90,48 @@
 
   <!-- SELECTOR DE CICLO -->
   <div id="cycleSelector" class="editor hidden">
-    <div>
-      <h3>Seleccionar ciclo</h3>
-      <label>Inicio:<input type="date" id="cycleStart"></label>
-      <label>Fin:<input type="date" id="cycleEnd"></label>
+    <div class="editor-content">
+      <h3 style="margin-top:0; font-size:16px;">Seleccionar Ciclo</h3>
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:4px;">Fecha de Inicio:</label>
+      <input type="date" id="cycleStart" style="width:100%; padding:8px; box-sizing:border-box; border:1px solid #c6c6c8; border-radius:6px; margin-bottom:12px;">
+      
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:4px;">Fecha de Fin:</label>
+      <input type="date" id="cycleEnd" style="width:100%; padding:8px; box-sizing:border-box; border:1px solid #c6c6c8; border-radius:6px; margin-bottom:16px;">
+
       <div class="editor-buttons">
         <button id="applyCycle">Aplicar</button>
         <button id="cancelCycle">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE AJUSTES -->
+  <div id="settingsModal" class="editor hidden">
+    <div class="editor-content">
+      <h3 style="margin-top:0; font-size:16px;">Ajustes de la App</h3>
+      
+      <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin-bottom: 12px;">
+        <input type="checkbox" id="settingTrasladoCuenta" style="width: 18px; height: 18px; margin-top: 2px;">
+        <span style="font-size: 14px; font-weight: 500;">Los días de Traslado cuentan para los metros / ciclo</span>
+      </label>
+
+      <div style="border-top: 1px solid #e5e5ea; padding-top: 12px; margin-bottom: 12px;">
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+          <input type="checkbox" id="settingDiasExtraNoCuenta" style="width: 18px; height: 18px; margin-top: 2px;">
+          <span style="font-size: 14px; font-weight: 500;">Los días extra NO cuentan para el ciclo / metros</span>
+        </label>
+      </div>
+
+      <div style="border-top: 1px solid #e5e5ea; padding-top: 12px; margin-bottom: 15px;">
+        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+          <input type="checkbox" id="settingActivarSondas" style="width: 18px; height: 18px;">
+          <span style="font-size: 14px; font-weight: 500;">Activar sondas</span>
+        </label>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button id="saveSettings" style="background: #007aff; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight:600;">Guardar</button>
+        <button id="cancelSettings" style="background: #e4e4e6; color: #1c1c1e; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight:600;">Cancelar</button>
       </div>
     </div>
   </div>
