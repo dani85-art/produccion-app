@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initEditor();
   initCycleSelector();
   initSettingsModal();
+  initExportReportModal();
   initBackup();
   renderCalendar();
   loadCycleDates();
@@ -64,7 +65,7 @@ function renderCalendar() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
- const monthLabelEl = document.getElementById('monthLabel');
+  const monthLabelEl = document.getElementById('monthLabel');
   if (monthLabelEl) {
     let textoMes = currentDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
     monthLabelEl.textContent = textoMes.replace(' DE ', ' ');
@@ -306,7 +307,6 @@ function calculateAndShowCycle(start, end) {
         diasTrasladoCiclo++;
       }
       
-      // 1. Cálculo para Días totales del ciclo y metros (respetando ajustes)
       if (diaCuentaParaCiclo(r)) {
         diasComputables++;
         
@@ -315,7 +315,6 @@ function calculateAndShowCycle(start, end) {
         }
       }
 
-      // 2. Cálculo para Días trabajados: Días normales con metros O cualquier día de traslado (independientemente del ajuste)
       const tieneMetros = r.metros !== '' && r.metros !== null && r.metros !== undefined;
       const esDiaTrabajadoNormal = diaCuentaParaCiclo(r) && tieneMetros;
       const esTraslado = r.traslado;
@@ -375,6 +374,95 @@ function calculateAndShowCycle(start, end) {
   });
 }
 
+function exportCycleReport(start, end) {
+  if (!start || !end) {
+    alert('Por favor, selecciona un periodo válido.');
+    return;
+  }
+
+  getAllDays().then(registros => {
+    const cycleDays = registros.filter(r => {
+      if (r.fecha < start || r.fecha > end) return false;
+      if (r.turno === 'D') return false;
+      
+      const tieneTurno = r.turno && r.turno.trim() !== '';
+      const tieneMetros = r.metros !== null && r.metros !== undefined && r.metros !== '';
+      const tieneExtras = r.manitou || r.traslado || r.extra;
+      const tieneSondas = r.sondas && r.sondas.length > 0;
+
+      return tieneTurno || tieneMetros || tieneExtras || tieneSondas;
+    });
+
+    cycleDays.sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    if (cycleDays.length === 0) {
+      alert('No hay registros válidos en el periodo seleccionado.');
+      return;
+    }
+
+    const activarSondas = localStorage.getItem('settingActivarSondas') === 'true';
+
+    let sumaMetrosTotales = 0;
+    let totalManitou = 0;
+    let totalTraslado = 0;
+
+    let content = `INFORME DE CICLO\n`;
+    content += `Periodo: ${formatDate(start)} al ${formatDate(end)}\n`;
+    content += `===================================================================\n\n`;
+
+    if (activarSondas) {
+      content += `FECHA       TURNO  METROS   SONDAS          MANITOU   TRASLADO\n`;
+      content += `-------------------------------------------------------------------\n`;
+    } else {
+      content += `FECHA       TURNO  METROS   MANITOU   TRASLADO\n`;
+      content += `---------------------------------------------------\n`;
+    }
+
+    cycleDays.forEach(r => {
+      const fecha = formatDate(r.fecha); 
+      const turno = (r.turno ? r.turno : '').padEnd(6, ' ');
+      
+      const numMetros = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? Number(r.metros) : 0;
+      sumaMetrosTotales += numMetros;
+      const metrosVal = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? `${r.metros}m` : '';
+      const metros = metrosVal.padEnd(8, ' ');
+
+      // SÍ centrado exactamente bajo el texto de la cabecera MANITOU y TRASLADO
+      const manitouStr = r.manitou ? '  SÍ   ' : '       ';
+      const trasladoStr = r.traslado ? '   SÍ   ' : '        ';
+      
+      if (r.manitou) totalManitou += 1;
+      if (r.traslado) totalTraslado += 1;
+
+      if (activarSondas) {
+        const sondasStr = (r.sondas && r.sondas.length > 0) ? r.sondas.join(', ') : '';
+        const sondasCol = sondasStr.padEnd(15, ' ');
+        content += `${fecha}   ${turno} ${metros}  ${sondasCol}  ${manitouStr}  ${trasladoStr}\n`;
+      } else {
+        content += `${fecha}   ${turno} ${metros}  ${manitouStr}  ${trasladoStr}\n`;
+      }
+    });
+
+    content += `----------------------------------------------------------------===\n`;
+    content += `TOTAL METROS REALIZADOS: ${sumaMetrosTotales.toFixed(1)} m\n`;
+
+    if (totalManitou > 0) {
+      content += `TOTAL MANITOU: ${totalManitou} ${totalManitou === 1 ? 'día' : 'días'}\n`;
+    }
+    if (totalTraslado > 0) {
+      content += `TOTAL TRASLADO: ${totalTraslado} ${totalTraslado === 1 ? 'día' : 'días'}\n`;
+    }
+
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `informe-ciclo-${formatDate(start).replace(/\//g, '-')}-al-${formatDate(end).replace(/\//g, '-')}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
 function initCycleSelector() {
   document.getElementById('openCycle')?.addEventListener('click', () => document.getElementById('cycleSelector')?.classList.remove('hidden'));
   document.getElementById('cancelCycle')?.addEventListener('click', () => document.getElementById('cycleSelector')?.classList.add('hidden'));
@@ -402,6 +490,44 @@ function loadCycleDates() {
     if (endInput) endInput.value = end;
     calculateAndShowCycle(start, end);
   }
+}
+
+function initExportReportModal() {
+  const modal = document.getElementById('exportReportModal');
+  const reportStart = document.getElementById('reportStart');
+  const reportEnd = document.getElementById('reportEnd');
+
+  document.getElementById('openExportModal')?.addEventListener('click', () => {
+    const start = localStorage.getItem('cycleStart') || new Date().toISOString().slice(0,10);
+    const end = localStorage.getItem('cycleEnd') || new Date().toISOString().slice(0,10);
+    
+    if (reportStart) reportStart.value = start;
+    if (reportEnd) reportEnd.value = end;
+
+    document.getElementById('settingsModal')?.classList.add('hidden');
+    modal?.classList.remove('hidden');
+  });
+
+  document.getElementById('cancelExportReport')?.addEventListener('click', () => {
+    modal?.classList.add('hidden');
+  });
+
+  document.getElementById('confirmExportReport')?.addEventListener('click', () => {
+    const start = reportStart?.value;
+    const end = reportEnd?.value;
+
+    if (!start || !end) {
+      alert('Selecciona ambas fechas');
+      return;
+    }
+    if (start > end) {
+      alert('La fecha de inicio no puede ser posterior a la fecha de fin.');
+      return;
+    }
+
+    exportCycleReport(start, end);
+    modal?.classList.add('hidden');
+  });
 }
 
 function initSettingsModal() {
