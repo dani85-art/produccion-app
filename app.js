@@ -406,14 +406,50 @@ function exportCycleReport(start, end) {
     let totalManitou = 0;
     let totalTraslado = 0;
 
-    let content = `INFORME DE CICLO\n`;
-    content += `Periodo: ${formatDate(start)} al ${formatDate(end)}\n`;
-    content += `=========================================\n\n`;
+    let html = `<!DOCTYPE html>
+    <html lang="es">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Informe de Ciclo</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; padding: 20px; margin: 0; }
+        h2 { font-size: 18px; margin-bottom: 4px; color: #38bdf8; }
+        p { font-size: 14px; color: #94a3b8; margin-bottom: 16px; }
+        .table-container { width: 100%; overflow-x: auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3); background: #1e293b; }
+        table { width: auto; border-collapse: collapse; white-space: nowrap; text-align: left; margin: 0; }
+        th, td { padding: 10px 20px; font-size: 14px; border-bottom: 1px solid #334155; }
+        th { background: #334155; color: #e2e8f0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { color: #f1f5f9; }
+        tr:last-child td { border-bottom: none; }
+        .totals { margin-top: 20px; background: #1e293b; padding: 16px; border-radius: 8px; font-size: 14px; max-width: 400px; }
+        .totals p { margin: 6px 0; color: #f8fafc; }
+      </style>
+    </head>
+    <body>
+      <h2>INFORME DE CICLO</h2>
+      <p>Periodo: ${formatDate(start)} al ${formatDate(end)}</p>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Turno</th>
+              <th>Metros</th>`;
+    if (activarSondas) {
+      html += `<th>Sondas</th>`;
+    }
+    html += `<th>Manitou</th>
+              <th>Traslado</th>
+            </tr>
+          </thead>
+          <tbody>`;
 
     cycleDays.forEach(r => {
       const fecha = formatDate(r.fecha);
-      const turno = r.turno ? `Turno: ${r.turno}` : 'Sin turno';
-      const metros = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? `${r.metros} m` : '0 m';
+      const turno = r.turno || '-';
+      const metros = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? `${r.metros} m` : '-';
       
       const numMetros = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? Number(r.metros) : 0;
       sumaMetrosTotales += numMetros;
@@ -421,32 +457,40 @@ function exportCycleReport(start, end) {
       if (r.manitou) totalManitou++;
       if (r.traslado) totalTraslado++;
 
-      content += `• ${fecha} | ${turno} | ${metros}`;
-      
-      if (activarSondas && r.sondas && r.sondas.length > 0) {
-        content += ` | Sondas: ${r.sondas.join(', ')}`;
+      html += `<tr>
+        <td>${fecha}</td>
+        <td>${turno}</td>
+        <td>${metros}</td>`;
+      if (activarSondas) {
+        const sondasStr = (r.sondas && r.sondas.length > 0) ? r.sondas.join(', ') : '-';
+        html += `<td>${sondasStr}</td>`;
       }
-      if (r.manitou) content += ` | Manitou: SÍ`;
-      if (r.traslado) content += ` | Traslado: SÍ`;
-      
-      content += `\n`;
+      html += `<td>${r.manitou ? 'SÍ' : '-'}</td>
+        <td>${r.traslado ? 'SÍ' : '-'}</td>
+      </tr>`;
     });
 
-    content += `\n=========================================\n`;
-    content += `TOTAL METROS REALIZADOS: ${sumaMetrosTotales.toFixed(1)} m\n`;
+    html += `  </tbody>
+        </table>
+      </div>
 
+      <div class="totals">
+        <p><strong>TOTAL METROS REALIZADOS:</strong> ${sumaMetrosTotales.toFixed(1)} m</p>`;
     if (totalManitou > 0) {
-      content += `TOTAL MANITOU: ${totalManitou} ${totalManitou === 1 ? 'día' : 'días'}\n`;
+      html += `<p><strong>TOTAL MANITOU:</strong> ${totalManitou} ${totalManitou === 1 ? 'día' : 'días'}</p>`;
     }
     if (totalTraslado > 0) {
-      content += `TOTAL TRASLADO: ${totalTraslado} ${totalTraslado === 1 ? 'día' : 'días'}\n`;
+      html += `<p><strong>TOTAL TRASLADO:</strong> ${totalTraslado} ${totalTraslado === 1 ? 'día' : 'días'}</p>`;
     }
+    html += `</div>
+    </body>
+    </html>`;
 
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `informe-ciclo-${formatDate(start).replace(/\//g, '-')}-al-${formatDate(end).replace(/\//g, '-')}.txt`;
+    a.download = `informe-ciclo-${formatDate(start).replace(/\//g, '-')}-al-${formatDate(end).replace(/\//g, '-')}.html`;
     a.click();
     URL.revokeObjectURL(url);
   });
