@@ -33,6 +33,12 @@
   <section id="cycleResult">
     <div class="cycle-row"><span>Periodo del ciclo:</span> <strong id="cyclePeriod">-</strong></div>
     <div class="cycle-row"><span>Días totales del ciclo:</span> <strong id="cycleTotalDays">0</strong></div>
+    
+    <div class="cycle-row" id="cycleTrasladoRow" style="display: none;">
+      <span>Días de traslado:</span> 
+      <strong id="cycleTrasladoDays">0</strong>
+    </div>
+    
     <div class="cycle-row"><span>Objetivo total del ciclo:</span> <strong id="cycleTarget">0.0 m</strong></div>
     <div class="cycle-divider"></div>
     <div class="cycle-row"><span>Metros realizados:</span> <strong id="cycleTotal">0.0 m</strong></div>
@@ -68,7 +74,6 @@
         <label class="checkbox-label"><input type="checkbox" id="editorTraslado"> Traslado</label>
       </div>
 
-      <!-- Sondas (Se muestran aquí solo si están activadas en Ajustes) -->
       <div id="editorSondasContainer" style="display:none; margin-top:10px;">
         <label style="font-size: 13px; font-weight:600; display:block; margin-bottom:4px;">Sonda:</label>
         <div class="sonda-options-horizontal" style="display:flex; flex-wrap:wrap; gap:10px;">
