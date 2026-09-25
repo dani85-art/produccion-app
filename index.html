@@ -112,6 +112,24 @@
     </div>
   </div>
 
+  <!-- MODAL EXPORTAR INFORME -->
+  <div id="exportReportModal" class="editor hidden">
+    <div class="editor-content">
+      <h3 style="margin-top:0; font-size:16px; font-weight:600; color:#1c1c1e; margin-bottom:16px;">Exportar Informe de Ciclo</h3>
+      
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px; color:#3a3a3c;">Fecha de Inicio:</label>
+      <input type="date" id="reportStart" style="width:100%; padding:10px; box-sizing:border-box; border:0.5px solid #c6c6c8; border-radius:8px; margin-bottom:14px; font-size:15px; background:#f2f2f7; color:#1c1c1e;">
+      
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:6px; color:#3a3a3c;">Fecha de Fin:</label>
+      <input type="date" id="reportEnd" style="width:100%; padding:10px; box-sizing:border-box; border:0.5px solid #c6c6c8; border-radius:8px; margin-bottom:20px; font-size:15px; background:#f2f2f7; color:#1c1c1e;">
+
+      <div class="editor-buttons" style="display: flex; gap: 10px;">
+        <button id="confirmExportReport" style="background: #34c759; color: white; border: none; flex: 1; padding: 11px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px; box-shadow: 0 2px 4px rgba(52, 199, 89, 0.3);">Descargar</button>
+        <button id="cancelExportReport" style="background: #e5e5ea; color: #1c1c1e; border: none; flex: 1; padding: 11px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL DE AJUSTES -->
   <div id="settingsModal" class="editor hidden">
     <div class="editor-content">
@@ -134,6 +152,10 @@
           <input type="checkbox" id="settingActivarSondas" style="width: 18px; height: 18px;">
           <span style="font-size: 14px; font-weight: 500;">Activar sondas</span>
         </label>
+      </div>
+
+      <div style="border-top: 1px solid #e5e5ea; padding-top: 15px; margin-bottom: 15px;">
+        <button id="openExportModal" style="background: #34c759; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%;">📄 Exportar informe del ciclo actual</button>
       </div>
 
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
