@@ -408,42 +408,41 @@ function exportCycleReport(start, end) {
 
     let content = `INFORME DE CICLO\n`;
     content += `Periodo: ${formatDate(start)} al ${formatDate(end)}\n`;
-    content += `===================================================================\n\n`;
+    content += `=========================================\n\n`;
 
     if (activarSondas) {
-      content += `FECHA       TURNO  METROS   SONDAS          MANITOU   TRASLADO\n`;
-      content += `-------------------------------------------------------------------\n`;
+      content += `FECHA      TURNO METROS SONDAS   MAN TRAS\n`;
+      content += `-----------------------------------------\n`;
     } else {
-      content += `FECHA       TURNO  METROS   MANITOU   TRASLADO\n`;
-      content += `---------------------------------------------------\n`;
+      content += `FECHA      TURNO METROS MAN TRAS\n`;
+      content += `---------------------------------\n`;
     }
 
     cycleDays.forEach(r => {
       const fecha = formatDate(r.fecha); 
-      const turno = (r.turno ? r.turno : '').padEnd(6, ' ');
+      const turno = (r.turno ? r.turno : '').padEnd(5, ' ');
       
       const numMetros = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? Number(r.metros) : 0;
       sumaMetrosTotales += numMetros;
       const metrosVal = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? `${r.metros}m` : '';
-      const metros = metrosVal.padEnd(8, ' ');
+      const metros = metrosVal.padEnd(7, ' ');
 
-      // SÍ centrado exactamente bajo el texto de la cabecera MANITOU y TRASLADO
-      const manitouStr = r.manitou ? '  SÍ   ' : '       ';
-      const trasladoStr = r.traslado ? '   SÍ   ' : '        ';
+      const manStr = r.manitou ? 'SÍ ' : '   ';
+      const trasStr = r.traslado ? 'SÍ' : '  ';
       
       if (r.manitou) totalManitou += 1;
       if (r.traslado) totalTraslado += 1;
 
       if (activarSondas) {
         const sondasStr = (r.sondas && r.sondas.length > 0) ? r.sondas.join(', ') : '';
-        const sondasCol = sondasStr.padEnd(15, ' ');
-        content += `${fecha}   ${turno} ${metros}  ${sondasCol}  ${manitouStr}  ${trasladoStr}\n`;
+        const sondasCol = sondasStr.padEnd(10, ' ');
+        content += `${fecha}  ${turno} ${metros} ${sondasCol}  ${manStr} ${trasStr}\n`;
       } else {
-        content += `${fecha}   ${turno} ${metros}  ${manitouStr}  ${trasladoStr}\n`;
+        content += `${fecha}  ${turno} ${metros}  ${manStr} ${trasStr}\n`;
       }
     });
 
-    content += `----------------------------------------------------------------===\n`;
+    content += `-----------------------------------------\n`;
     content += `TOTAL METROS REALIZADOS: ${sumaMetrosTotales.toFixed(1)} m\n`;
 
     if (totalManitou > 0) {
