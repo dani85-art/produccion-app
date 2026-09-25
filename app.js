@@ -408,42 +408,31 @@ function exportCycleReport(start, end) {
 
     let content = `INFORME DE CICLO\n`;
     content += `Periodo: ${formatDate(start)} al ${formatDate(end)}\n`;
-    content += `=====================================\n\n`;
-
-    if (activarSondas) {
-      content += `FECHA      TURNO METROS SONDAS   MAN TRAS\n`;
-      content += `-------------------------------------\n`;
-    } else {
-      content += `FECHA      TURNO METROS MAN TRAS\n`;
-      content += `---------------------------------\n`;
-    }
+    content += `=========================================\n\n`;
 
     cycleDays.forEach(r => {
-      const fecha = formatDate(r.fecha).padEnd(10, ' ');
-      const turnoStr = (r.turno ? r.turno : '').padEnd(5, ' ');
+      const fecha = formatDate(r.fecha);
+      const turno = r.turno ? `Turno: ${r.turno}` : 'Sin turno';
+      const metros = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? `${r.metros} m` : '0 m';
       
       const numMetros = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? Number(r.metros) : 0;
       sumaMetrosTotales += numMetros;
-      const metrosVal = (r.metros !== null && r.metros !== undefined && r.metros !== '') ? `${r.metros}m` : '';
-      const metrosStr = metrosVal.padEnd(7, ' ');
 
-      // Asignación estricta de ancho para que coincida exactamente con las columnas MAN (3 chars) y TRAS (4 chars)
-      const manStr = (r.manitou ? 'SÍ' : '').padEnd(3, ' ');
-      const trasStr = (r.traslado ? 'SÍ' : '').padEnd(4, ' ');
+      if (r.manitou) totalManitou++;
+      if (r.traslado) totalTraslado++;
+
+      content += `• ${fecha} | ${turno} | ${metros}`;
       
-      if (r.manitou) totalManitou += 1;
-      if (r.traslado) totalTraslado += 1;
-
-      if (activarSondas) {
-        const sondasStr = (r.sondas && r.sondas.length > 0) ? r.sondas.join(', ') : '';
-        const sondasCol = sondasStr.padEnd(10, ' ');
-        content += `${fecha}  ${turnoStr} ${metrosStr} ${sondasCol} ${manStr} ${trasStr}\n`;
-      } else {
-        content += `${fecha}  ${turnoStr} ${metrosStr} ${manStr} ${trasStr}\n`;
+      if (activarSondas && r.sondas && r.sondas.length > 0) {
+        content += ` | Sondas: ${r.sondas.join(', ')}`;
       }
+      if (r.manitou) content += ` | Manitou: SÍ`;
+      if (r.traslado) content += ` | Traslado: SÍ`;
+      
+      content += `\n`;
     });
 
-    content += `-------------------------------------\n`;
+    content += `\n=========================================\n`;
     content += `TOTAL METROS REALIZADOS: ${sumaMetrosTotales.toFixed(1)} m\n`;
 
     if (totalManitou > 0) {
