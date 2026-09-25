@@ -4,7 +4,6 @@ function diaCuentaParaCiclo(r) {
   const trasladosCuentan = localStorage.getItem('settingTrasladoCuenta') === 'true';
   const diasExtraNoCuentan = localStorage.getItem('settingDiasExtraNoCuenta') === 'true';
 
-  // Si el ajuste de exclusión está activo y el día tiene marca extra (EXT), no cuenta para el ciclo bajo ningún concepto
   const esDiaExtra = r.extra === true || r.etiquetas?.includes('EXT');
   if (diasExtraNoCuentan && esDiaExtra) {
     return false;
@@ -65,9 +64,10 @@ function renderCalendar() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
 
-  const monthLabelEl = document.getElementById('monthLabel');
+ const monthLabelEl = document.getElementById('monthLabel');
   if (monthLabelEl) {
-    monthLabelEl.textContent = currentDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+    let textoMes = currentDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).toUpperCase();
+    monthLabelEl.textContent = textoMes.replace(' DE ', ' ');
   }
 
   const firstDay = new Date(year, month, 1);
@@ -151,10 +151,9 @@ function calcularResumenMensual(registros, year, month) {
     if (r.manitou) diasManitou++;
     if (r.extra) diasExtra++;
     
-    // El resumen mensual también puede excluir los extras si el ajuste está activo
     const diasExtraNoCuentan = localStorage.getItem('settingDiasExtraNoCuenta') === 'true';
     const esDiaExtra = r.extra === true || r.etiquetas?.includes('EXT');
-    if (diasExtraNoCuentan && esDiaExtra) return; // Se salta este día para el cómputo mensual de metros
+    if (diasExtraNoCuentan && esDiaExtra) return;
     
     const cuentaMensual = r.traslado ? (localStorage.getItem('settingTrasladoCuenta') === 'true') : (r.turno === 'M' || r.turno === 'T' || r.turno === 'N');
     
@@ -289,26 +288,40 @@ function calculateAndShowCycle(start, end) {
     let metros = 0;
     let diasComputables = 0;
     let diasTrabajados = 0;
+    let diasTrasladoCiclo = 0;
     
     const diasExtraNoCuentan = localStorage.getItem('settingDiasExtraNoCuenta') === 'true';
+    const trasladoCuenta = localStorage.getItem('settingTrasladoCuenta') === 'true';
 
     registros.forEach(r => {
       if (r.fecha < start || r.fecha > end) return;
       
       const esDiaExtra = r.extra === true || r.etiquetas?.includes('EXT');
 
-      // Si el día es extra y el ajuste pide excluirlos, se ignoran por completo para el ciclo y sus metros
       if (diasExtraNoCuentan && esDiaExtra) {
         return;
       }
+
+      if (r.traslado) {
+        diasTrasladoCiclo++;
+      }
       
+      // 1. Cálculo para Días totales del ciclo y metros (respetando ajustes)
       if (diaCuentaParaCiclo(r)) {
         diasComputables++;
         
         if (r.metros !== '' && r.metros !== null && r.metros !== undefined) {
-          diasTrabajados++;
           metros += Number(r.metros);
         }
+      }
+
+      // 2. Cálculo para Días trabajados: Días normales con metros O cualquier día de traslado (independientemente del ajuste)
+      const tieneMetros = r.metros !== '' && r.metros !== null && r.metros !== undefined;
+      const esDiaTrabajadoNormal = diaCuentaParaCiclo(r) && tieneMetros;
+      const esTraslado = r.traslado;
+
+      if (esDiaTrabajadoNormal || esTraslado) {
+        diasTrabajados++;
       }
     });
 
@@ -329,6 +342,17 @@ function calculateAndShowCycle(start, end) {
   
     const cycleTotalDaysEl = document.getElementById('cycleTotalDays');
     if (cycleTotalDaysEl) cycleTotalDaysEl.textContent = diasComputables;
+
+    const cycleTrasladoRowEl = document.getElementById('cycleTrasladoRow');
+    const cycleTrasladoDaysEl = document.getElementById('cycleTrasladoDays');
+    if (cycleTrasladoRowEl && cycleTrasladoDaysEl) {
+      if (!trasladoCuenta && diasTrasladoCiclo > 0) {
+        cycleTrasladoDaysEl.textContent = diasTrasladoCiclo;
+        cycleTrasladoRowEl.style.display = 'flex';
+      } else {
+        cycleTrasladoRowEl.style.display = 'none';
+      }
+    }
     
     const cycleTargetEl = document.getElementById('cycleTarget');
     if (cycleTargetEl) cycleTargetEl.textContent = `${objetivoTotal.toFixed(1)} m`;
